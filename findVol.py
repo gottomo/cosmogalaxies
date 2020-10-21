@@ -114,11 +114,11 @@ def comoving_vol_elm(z, omega_m, omega_k, omega_0, model, **kwargs):
 	return 3000 / h * (1 + z)**2 * ang_diameter_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 / e(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
 	
 def delta_com_vol_elm(z, omega_m, omega_k, omega_0, model, **kwargs):
-	# Returns the difference between comoving volume element at z=1 and arbitrary z
+	# Returns the difference between comoving volume element of LCDM and a chosen model
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h', 0.7)
-	return comoving_vol_elm(1, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1) - comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
+	return comoving_vol_elm(z, 0.3, 0, 0.7, 'lambda') - comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
 	
 def magnitude_bol(L, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the magnitude of an object with luminosity L at redshift z for different cosmology
@@ -177,7 +177,7 @@ fig1.legend()
 
 # Plot of delta_com_vol_elm
 fig3, ax3 = plt.subplots()
-ax3.set_title(r"Difference in comoving volume elements between at z=1 and at arbitrary z")
+ax3.set_title(r"Difference in comoving volume elements between LCDM and arbitrary model")
 ax3.set_xlabel("Redshift z")
 ax3.set_ylabel(r"$\Delta\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
 ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
@@ -188,20 +188,6 @@ ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0
 ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
 ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
 fig3.legend(loc=5)
-plt.grid()
-
-fig4, ax4 = plt.subplots()
-ax4.set_title(r"")
-ax4.set_xlabel("Redshift z")
-ax4.set_ylabel("Bolometric magnitude")
-ax4.plot(z, magnitude_bol_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
-ax4.plot(z, magnitude_bol_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
-ax4.plot(z, magnitude_bol_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
-ax4.plot(z, magnitude_bol_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
-ax4.plot(z, magnitude_bol_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
-ax4.plot(z, magnitude_bol_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
-ax4.plot(z, magnitude_bol_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
-fig4.legend(loc=5)
 plt.grid()
 
 
