@@ -6,8 +6,6 @@ from scipy.integrate import quad # this module does the integration
 # Hubble constant is h = 0.7 by default
 # By default the functions are written so that it returns cosmological constant (lambda) dark energy model
 
-# Constants
-
 # Functinos
 # def w(z, model = 'lambda', **kwargs):
 	# # Returns the redshift (z) dependent dark energy equation of state parameters w(z) = pressure(z)/density(z)
