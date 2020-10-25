@@ -7,35 +7,7 @@ from scipy.integrate import quad # this module does the integration
 # By default the functions are written so that it returns cosmological constant (lambda) dark energy model
 
 # Functinos
-# def w(z, model = 'lambda', **kwargs):
-	# # Returns the redshift (z) dependent dark energy equation of state parameters w(z) = pressure(z)/density(z)
-	# # Maybe other models should also be considered where not necessarily pressure = w * density
-	# # Not used anymore, because it has to be incorporated into f_integral for the scipy's quad() function to work
-	# w_0 = kwargs.get('w_0', -1)
-	# w_1 = kwargs.get('w_1', 0)
-	# if model == 'lambda':
-		# return -1
-	# elif model == 'constant_w':
-		# return w_0
-	# elif model == 'linear':
-		# return w_0 - w_1 * z
 	
-# def f_integral(z, model = 'lambda', **kwargs):
-	# # An intermediate function.  The function 1+w/(1+z), which appears inside the integral on the exponent for the function f(z) as in omega_de(z) = omega_de_0 * f(z)
-	# # There are analytical solutions to f(z) for many parametrizatinos, so this function may be unnecessary
-	# w_0 = kwargs.get('w_0', -1)
-	# w_1 = kwargs.get('w_1', 0)
-	# #return 1 + w(z, model, w_0 = w_0, w_1 = w_1) / (1 + z)
-	# if model == 'lambda':
-		# return 0
-	# elif model == 'constant_w':
-		# return 1 + w_0 / (1 + z)
-	# elif model == 'linear':
-		# return 1 + w_0 - w_1 * z / (1 + z)
-
-# def integrand_linear(z, w_0, w_1):
-	# return 1 + w_0 - w_1 * z / (1 + z)
-
 def omega_de(z, omega_0, model, **kwargs ):
 	# Returns the density parameter of dark energy for different models
 	# If using constant_w model, you need to also input the value of w to test models other than w=-1
@@ -60,13 +32,6 @@ def e(z, omega_m, omega_k, omega_0, model, **kwargs):
 	w_1 = kwargs.get('w_1')
 	return np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
 	
-# def inv_e(z, omega_m, omega_k, omega_0, model = 'lambda', **kwargs):
-	# # Inverse of e, 1/e to be used in the integral for calculating line-of-sight comoving distance
-	# # There may be a better way to do, but scipy's quad function only seems to accept python functions, not equations by itself
-	# w_0 = kwargs.get('w_0', -1)
-	# w_1 = kwargs.get('w_1', 0)
-	# return 1 / np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
-
 def comoving_d_los(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the line-of-sight comoving distance in Mpc
 	# Also works in the case if z is array
@@ -128,10 +93,27 @@ def magnitude_bol(L, z, omega_m, omega_k, omega_0, model, **kwargs):
 	const = 4.74 + np.log10(3.84e26 / (4*np.pi*10**2))
 	return -2.5 * np.log10(L / (4*np.pi*lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e-5**2 ) )
 
-# Vectorize the functions you want to plot with matplotlib, so that function can accept np arrays
+def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
+	# Returns Schechter function as a function of mass
+	# mass shall be given in the unit of dex (i.e. mass = log10(mass_in_solar_mass) )
+	mass_diff = mass - break_mass
+	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
+	
+def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, w_0, w_1, h):
+	# Returns the mass of a galaxy given its apparent magnitude and the redshift
+	# First calculate the luminosity from the apparent magnitude and redshift
+	# a const. for setting a reference point for magnitude, which will return the luminosity in the unit of solar luminosity
+	k = -3.01 
+	lum = np.power(10, (k - mag) / 2.5) * 4* np.pi * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2
+	# Then calculate and return mass by multiplying luminosity by 3
+	return 3 * lum
+	
+	
+# Vectorizes the functions I want to plot with matplotlib, so that function can accept np arrays
 comoving_vol_elm_vec = np.vectorize(comoving_vol_elm)
 delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
 magnitude_bol_vec = np.vectorize(magnitude_bol)
+schechter_mass_vec = np.vectorize(schechter_mass)
 
 # Set the Hubbles constant
 h_today = 0.7
@@ -139,23 +121,19 @@ h_today = 0.7
 # Plotting stuff
 z = np.linspace(0.01,3,100)
 
-fig1, ax1 = plt.subplots()
 # Plots of comoving volume element per uint solid angle per unit redshift, normalized by 1/(D_H)^3
-ax1.set_xlabel("Redshift z")
-ax1.set_ylabel(r"Dimensionless comoving volume element $\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
-ax1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
-# ax1.plot(z, comoving_vol_elm(z, 0.3, 0, 0.7, model = 'linear', w_0 = -0.9 , h=h_today) / (3000/h_today)**3, label='linear')
-# plt.plot(z, comoving_vol_elm(z, 0.3, 0, 0.7, h=h_today), '-', label='LCDM') # LCDM
-# plt.plot(z, comoving_vol_elm(z, 1, 0, 0, h=h_today), '--', label='E-deS') # E-deS
-# plt.plot(z, comoving_vol_elm(z, 0.3, 0.7, 0, h=h_today), '-.', label='OCDM') # OCDM
-plt.grid()
-fig1.legend()
+# fig1, ax1 = plt.subplots()
+# ax1.set_xlabel("Redshift z")
+# ax1.set_ylabel(r"Dimensionless comoving volume element $\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
+# ax1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
+# plt.grid()
+# fig1.legend()
 
 # fig2, ax2 = plt.subplots()
 # ax2.set_xlabel("Redshift z")
@@ -174,19 +152,29 @@ fig1.legend()
 
 
 # Plot of delta_com_vol_elm
-fig3, ax3 = plt.subplots()
-ax3.set_title(r"Difference in comoving volume elements between LCDM and arbitrary model")
-ax3.set_xlabel("Redshift z")
-ax3.set_ylabel(r"$\Delta\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
-ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
-ax3.plot(z, delta_com_vol_elm_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
-ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
-ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
-ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
-ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
-ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
-fig3.legend(loc=5)
-plt.grid()
+# fig3, ax3 = plt.subplots()
+# ax3.set_title(r"Difference in comoving volume elements between LCDM and arbitrary model")
+# ax3.set_xlabel("Redshift z")
+# ax3.set_ylabel(r"$\Delta\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
+# ax3.plot(z, delta_com_vol_elm_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
+# fig3.legend(loc=5)
+# plt.grid()
 
+mass_dex_array = np.linspace(7,12,200)
+
+# Plot of schechter function as a function of mass
+# This one using the equation from A. Mortlock (2015) paper, all mass in unit of dex
+fig4, ax4 = plt.subplots()
+ax4.set_xlabel(r"$M$ $(dex)$")
+ax4.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {pc}^{-3}$)")
+ax4.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47))
+ax4.set_yscale('log')
+plt.grid()
 
 plt.show()
