@@ -4,16 +4,16 @@ from scipy.integrate import quad # this module does the integration
 
 # This code finds the comoving volume element per solid angle per redshift for different cosmological models
 # Hubble constant is h = 0.7 by default
-# By default the functions are written so that it returns cosmological constant (lambda) dark energy model
+# By default the functions are written so that it returns cosmological constant (LCDM) dark energy model
 
 # Functinos
 	
 def omega_de(z, omega_0, model, **kwargs ):
 	# Returns the density parameter of dark energy for different models
 	# If using constant_w model, you need to also input the value of w to test models other than w=-1
-	w_0 = kwargs.get('w_0') # by default gives lambda model
+	w_0 = kwargs.get('w_0') # by default gives LCDM model
 	w_1 = kwargs.get('w_1')
-	if model == 'lambda':
+	if model == 'LCDM':
 		# This branch not really necessary, can be replaces with model = 'linear'
 		return omega_0
 	elif model == 'constant_w':
@@ -71,6 +71,7 @@ def lum_d(z, omega_m, omega_k, omega_0, model, **kwargs):
 
 def comoving_vol_elm(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns comoving volume element per unit solid angle per unit redshift
+	# to obtain a value in unit of Mpc^3, multiply with h / 3000
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h', 0.7)
@@ -81,7 +82,7 @@ def delta_com_vol_elm(z, omega_m, omega_k, omega_0, model, **kwargs):
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h', 0.7)
-	return comoving_vol_elm(z, 0.3, 0, 0.7, 'lambda') - comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
+	return comoving_vol_elm(z, 0.3, 0, 0.7, 'LCDM') - comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
 	
 def magnitude_bol(L, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the magnitude of an object with luminosity L at redshift z for different cosmology
@@ -99,14 +100,39 @@ def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
 	mass_diff = mass - break_mass
 	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
 	
-def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, w_0, w_1, h):
+def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the mass of a galaxy given its apparent magnitude and the redshift
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h', 0.7)
 	# First calculate the luminosity from the apparent magnitude and redshift
 	# a const. for setting a reference point for magnitude, which will return the luminosity in the unit of solar luminosity
 	k = -3.01 
-	lum = np.power(10, (k - mag) / 2.5) * 4* np.pi * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2
+	lum = np.power(10, (k - mag) / 2.5) * 4 * np.pi * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12 # note that lum_d is in unit of Mpc
 	# Then calculate and return mass by multiplying luminosity by 3
-	return 3 * lum
+	return 1 / 3 * np.log10(lum)
+	
+def galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, **kwargs):
+	# Returns the number density of galaxies as a function of redshift for a given magnitude limit with given cosmology model
+	# In the unit of Mpc^-3
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h', 0.7)
+	
+	mass_min = mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)
+	
+	return quad(lambda mass: schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2), mass_min, 15)[0]
+	
+def delta_galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, **kwargs):
+	# Returns the difference in number density of galaxies between LCDM and a given cosmology as a function of redshift, with given mass limit
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h', 0.7)
+	number_lambda = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, 0.3, 0, 0.7, 'LCDM') * comoving_vol_elm(z, 0.3, 0, 0.7, 'LCDM') * h / 3000
+	number = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * h /3000
+	return number - number_lambda
+
+
 	
 	
 # Vectorizes the functions I want to plot with matplotlib, so that function can accept np arrays
@@ -114,20 +140,27 @@ comoving_vol_elm_vec = np.vectorize(comoving_vol_elm)
 delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
 magnitude_bol_vec = np.vectorize(magnitude_bol)
 schechter_mass_vec = np.vectorize(schechter_mass)
+mag_to_mass_vec = np.vectorize(mag_to_mass)
+delta_galaxy_number_vec = np.vectorize(delta_galaxy_number)
+mag_to_mass_vec = np.vectorize(mag_to_mass)
 
 # Set the Hubbles constant
 h_today = 0.7
 
-# Plotting stuff
+
+print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM'))
+
+# -------------------------Plotting stuff------------------------------------
 z = np.linspace(0.01,3,100)
 
+# ---------------------------Comoving volume element------------------------------
 # Plots of comoving volume element per uint solid angle per unit redshift, normalized by 1/(D_H)^3
 # fig1, ax1 = plt.subplots()
 # ax1.set_xlabel("Redshift z")
 # ax1.set_ylabel(r"Dimensionless comoving volume element $\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
-# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
-# ax1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
-# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
+# ax1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'LCDM', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
 # ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
 # ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
 # ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
@@ -135,6 +168,7 @@ z = np.linspace(0.01,3,100)
 # plt.grid()
 # fig1.legend()
 
+# ------------------Angular diameter distance---------------------------
 # fig2, ax2 = plt.subplots()
 # ax2.set_xlabel("Redshift z")
 # ax2.set_ylabel(r"Angular diameter distance $D_A$ (Mpc)")
@@ -151,14 +185,14 @@ z = np.linspace(0.01,3,100)
 # plt.grid()
 
 
-# Plot of delta_com_vol_elm
+# -----------------------Plot of delta_com_vol_elm--------------------------------
 # fig3, ax3 = plt.subplots()
 # ax3.set_title(r"Difference in comoving volume elements between LCDM and arbitrary model")
 # ax3.set_xlabel("Redshift z")
 # ax3.set_ylabel(r"$\Delta\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
-# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, 'lambda', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
-# ax3.plot(z, delta_com_vol_elm_vec(z, 1, 0, 0, 'lambda', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
-# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0.7, 0, 'lambda', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
+# ax3.plot(z, delta_com_vol_elm_vec(z, 1, 0, 0, 'LCDM', h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
+# ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
 # ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) / (3000/h_today)**3, ':', label='w = -0.8')
 # ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) / (3000/h_today)**3, ':', label='w = -0.9')
 # ax3.plot(z, delta_com_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) / (3000/h_today)**3, ':', label='w = -1.1')
@@ -168,7 +202,7 @@ z = np.linspace(0.01,3,100)
 
 mass_dex_array = np.linspace(7,12,200)
 
-# Plot of schechter function as a function of mass
+# -------------------Plot of schechter function as a function of mass---------------------------
 # This one using the equation from A. Mortlock (2015) paper, all mass in unit of dex
 fig4, ax4 = plt.subplots()
 ax4.set_xlabel(r"$M$ $(dex)$")
@@ -176,5 +210,23 @@ ax4.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {pc}^{-3}$)")
 ax4.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47))
 ax4.set_yscale('log')
 plt.grid()
+
+#-------------------Plot of difference in no. density of galaxies btw LCDM and a given model----
+magnitude_min = 21
+fig5, ax5 = plt.subplots()
+ax5.set_ylabel(r"$\Delta \frac{dN}{dz}$")
+ax5.set_xlabel(r"$z$")
+ax5.set_title("min. app. magnitude = " + str(magnitude_min) + ", over all sky")
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM'), '-', label='LCDM')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM',), '--', label='E-deS')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM',), '-', label='OCDM')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+
+fig5.legend()
+plt.grid()
+
 
 plt.show()
