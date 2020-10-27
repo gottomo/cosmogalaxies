@@ -100,6 +100,14 @@ def magnitude_bol(L, z, omega_m, omega_k, omega_0, model, **kwargs):
 	h = kwargs.get('h', 0.7)
 	const = 4.74 + np.log10(3.84e26 / (4*np.pi*10**2))
 	return -2.5 * np.log10(L / (4*np.pi*lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e-5**2 ) )
+	
+def delta_mag(z, omega_m, omega_k, omega_0, model, **kwargs):
+	# Returns the difference between magnitudes of LCDM and a given cosmology model for a given redshift
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h', 0.7)
+
+	return 5 * np.log10(lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) / lum_d(z, 0.3, 0, 0.7, 'LCDM', h = h))
 
 def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
 	# Returns Schechter function as a function of mass
@@ -108,30 +116,30 @@ def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
 	mass_diff = mass - break_mass
 	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
 	
-def mag_to_mass_old(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
-	# Returns the mass of a galaxy given its apparent magnitude and the redshift
-	w_0 = kwargs.get('w_0')
-	w_1 = kwargs.get('w_1')
-	h = kwargs.get('h', 0.7)
-	# First calculate the luminosity from the apparent magnitude and redshift
-	mag_abs = mag_app - 5 * np.log10(lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)*1e6/10)
-	k = -0.26
-	lum = np.power(10, (k - mag) / 2.5) * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12 *100# note that lum_d is in unit of Mpc
-	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
-	mass = np.log10(lum) + np.log10(5)
-	return mass
-	
 def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the mass of a galaxy given its apparent magnitude and the redshift
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
-	h = kwargs.get('h', 0.7)
+	h = kwargs.get('h')
+	# First calculate the luminosity from the apparent magnitude and redshift
+	mag_abs = mag - 5 * np.log10(lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) *1e6 / 10)
+	lum = np.power(10, (4.74 - mag_abs) / 2.5) * 3.84e26 # note that lum_d is in unit of Mpc
+	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
+	#mass = np.log10(lum) + np.log10(5)
+	mass = 5 * lum / 1.989e30
+	return np.log10(mass)
+	
+def mag_to_mass_old(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
+	# Returns the mass of a galaxy given its apparent magnitude and the redshift
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h')
 	# First calculate the luminosity from the apparent magnitude and redshift
 	# k is a const. for setting a reference point for magnitude, which will return the luminosity in the unit of solar luminosity
 	k = -0.26
-	lum = np.power(10, (k - mag) / 2.5) * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12 *100# note that lum_d is in unit of Mpc
+	lum = np.power(10, (k - mag) / 2.5) * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12# note that lum_d is in unit of Mpc
 	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
-	mass = np.log10(lum) + np.log10(5)
+	mass = np.log10(lum) - np.log10(5)
 	return mass
 
 def galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, **kwargs):
@@ -139,20 +147,32 @@ def galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, o
 	# In the unit of Mpc^-3
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
-	h = kwargs.get('h', 0.7)
+	h = kwargs.get('h')
 	
 	mass_min = mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)
 	
 	return quad(lambda mass: schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2), mass_min, 15)[0]
 	
+def galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, **kwargs):
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h')
+	
+	number = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)
+	return number
+
+
+	
 def delta_galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the difference in number density of galaxies between LCDM and a given cosmology as a function of redshift, with given mass limit
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
-	h = kwargs.get('h', 0.7)
-	number_lambda = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, 0.3, 0, 0.7, 'LCDM') * comoving_vol_elm(z, 0.3, 0, 0.7, 'LCDM')
+	h = kwargs.get('h')
+	number_lambda = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, 0.3, 0, 0.7, 'LCDM', h = h) * comoving_vol_elm(z, 0.3, 0, 0.7, 'LCDM', h = h)
 	number = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)
 	return number - number_lambda
+	
+def delta_galaxy_number_bin()
 
 
 	
@@ -163,19 +183,21 @@ delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
 magnitude_bol_vec = np.vectorize(magnitude_bol)
 schechter_mass_vec = np.vectorize(schechter_mass)
 mag_to_mass_vec = np.vectorize(mag_to_mass)
+galaxy_number_vec = np.vectorize(galaxy_number)
 delta_galaxy_number_vec = np.vectorize(delta_galaxy_number)
-mag_to_mass_vec = np.vectorize(mag_to_mass)
+lum_d_vec = np.vectorize(lum_d)
+delta_mag_vec = np.vectorize(delta_mag)
 
 # Set the Hubbles constant
 h_today = 0.7
 
 print("Constant magnitude=21, varying redshift")
 print(np.array([0.1, 1, 2, 3]))
-print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM'))
+print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM', h = h_today))
 
-print("Constant z=0.1, varying magnitude")
-print(np.array([15, 20, 25, 30]))
-print(mag_to_mass_vec(np.array([15, 20, 25, 30]), 0.1, 0.3, 0, 0.7, 'LCDM'))
+# print("Constant z=0.1, varying magnitude")
+# print(np.array([15, 20, 25, 30]))
+# print(mag_to_mass_vec(np.array([15, 20, 25, 30]), 0.1, 0.3, 0, 0.7, 'LCDM'))
 
 # -------------------------Plotting stuff------------------------------------
 z = np.linspace(0.01,3,100)
@@ -255,14 +277,14 @@ plt.grid()
 #-------------------Plot of difference in no. density of galaxies btw LCDM and a given model----
 #dN/dz dOmega
 magnitude_min = 25
-one_sqr_degree = (np.pi/180)**2 / (4*np.pi)
+one_sqr_degree = (np.pi/180)**2 
 fig5, ax5 = plt.subplots()
 ax5.set_ylabel(r"$\Delta \frac{dN}{dz d \Omega}$")
 ax5.set_xlabel(r"$z$")
 ax5.set_title("min. app. magnitude = " + str(magnitude_min) + ", over all sky")
-ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM'), '-', label='LCDM')
-ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM',), '--', label='E-deS')
-ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM',), '-', label='OCDM')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
 ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
 ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
 ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
@@ -276,9 +298,9 @@ fig6, ax6 = plt.subplots()
 ax6.set_ylabel(r"$\Delta \frac{dN}{dz}$")
 ax6.set_xlabel(r"$z$")
 ax6.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM') * one_sqr_degree, '-', label='LCDM')
-ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM',) * one_sqr_degree, '--', label='E-deS')
-ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM',) * one_sqr_degree, '-', label='OCDM')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
 ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
 ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
 ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
@@ -287,6 +309,67 @@ ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -
 fig6.legend()
 plt.grid()
 
+#---------------Plot of absolute number of galaxies---------------
+fig7, ax7 = plt.subplots()
+ax7.set_ylabel(r"$\frac{dN}{dz}$")
+ax7.set_xlabel(r"$z$")
+ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
+
+fig7.legend()
+plt.grid()
+
+#------------Plot of minimum mass of galaxies observable for a given magnitude thres.-----------
+fig8, ax8 = plt.subplots()
+ax8.set_ylabel(r"Mass (dex)")
+ax8.set_xlabel(r"$z$")
+ax8.set_title('The lightest galaxy observable with the apparent magnitude threshold of ' + str(magnitude_min))
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+
+
+fig8.legend(loc = 'center right')
+plt.grid()
+
+# fig9, ax9 = plt.subplots()
+# ax9.set_ylabel(r"Luminosity distance (Mpc)")
+# ax9.set_xlabel(r"$z$")
+# ax9.plot(z, lum_d_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+# ax9.plot(z, lum_d_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+# ax9.plot(z, lum_d_vec( z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+# ax9.plot(z, lum_d_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax9.plot(z, lum_d_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax9.plot(z, lum_d_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax9.plot(z, lum_d_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+
+# fig9.legend(loc = 'center right')
+# plt.grid()
+
+
+# fig10, ax10 = plt.subplots()
+# ax10.set_ylabel(r"$\Delta$ magnitude")
+# ax10.set_xlabel(r"$z$")
+# ax10.plot(z, delta_mag_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+# ax10.plot(z, delta_mag_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+# ax10.plot(z, delta_mag_vec( z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+# ax10.plot(z, delta_mag_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax10.plot(z, delta_mag_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax10.plot(z, delta_mag_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax10.plot(z, delta_mag_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+
+# fig10.legend(loc = 'center right')
+# plt.grid()
 
 
 
