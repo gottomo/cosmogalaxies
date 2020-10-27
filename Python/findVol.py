@@ -30,7 +30,8 @@ def e(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the parameter E(z) required for other calculations
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
-	return np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
+	e = np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
+	return e
 	
 def comoving_d_los(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the line-of-sight comoving distance in Mpc
@@ -39,7 +40,8 @@ def comoving_d_los(z, omega_m, omega_k, omega_0, model, **kwargs):
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h')
-	return 3000 / h * quad(lambda Z: 1/e(Z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1), 0, z)[0]
+	com_d_los = 3000 / h * quad(lambda Z: 1/e(Z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1), 0, z)[0]
+	return com_d_los
 	
 def comoving_d(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the transverse comoving distance in Mpc
@@ -51,31 +53,36 @@ def comoving_d(z, omega_m, omega_k, omega_0, model, **kwargs):
 	if omega_k == 0:
 		return com_d_los
 	elif omega_k < 0:
-		return 3000 / (h * np.sqrt(omega_k)) * np.sin(np.sqrt(abs(omega_k)) * com_d_los * h / 3000)
+		com_d = 3000 / (h * np.sqrt(omega_k)) * np.sin(np.sqrt(abs(omega_k)) * com_d_los * h / 3000)
+		return com_d
 	elif omega_k > 0:
-		return 3000 / (h * np.sqrt(omega_k)) * np.sinh(np.sqrt(abs(omega_k)) * com_d_los * h / 3000)
+		com_d = 3000 / (h * np.sqrt(omega_k)) * np.sinh(np.sqrt(abs(omega_k)) * com_d_los * h / 3000)
+		return com_d
 
 def ang_diameter_d(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns angular diameter distance
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h')
-	return comoving_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) / (1 + z)
+	ang_di_d = comoving_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) / (1 + z)
+	return ang_di_d
 	
 def lum_d(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the luminosity distance
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h')
-	return comoving_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * (1 + z)
+	lum_d = comoving_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * (1 + z)
+	return lum_d
 
 def comoving_vol_elm(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns comoving volume element per unit solid angle per unit redshift
-	# to obtain a value in unit of Mpc^3, multiply with h / 3000
+	# is in unit of Mpc^3
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h', 0.7)
-	return 3000 / h * (1 + z)**2 * ang_diameter_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 / e(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
+	com_vol_elm = 3000 / h * (1 + z)**2 * ang_diameter_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 / e(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1)
+	return com_vol_elm
 	
 def delta_com_vol_elm(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the difference between comoving volume element of LCDM and a chosen model
@@ -97,8 +104,22 @@ def magnitude_bol(L, z, omega_m, omega_k, omega_0, model, **kwargs):
 def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
 	# Returns Schechter function as a function of mass
 	# mass shall be given in the unit of dex (i.e. mass = log10(mass_in_solar_mass) )
+	# Will be in unit of dex^-1 Mpc^-3
 	mass_diff = mass - break_mass
 	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
+	
+def mag_to_mass_old(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
+	# Returns the mass of a galaxy given its apparent magnitude and the redshift
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h', 0.7)
+	# First calculate the luminosity from the apparent magnitude and redshift
+	mag_abs = mag_app - 5 * np.log10(lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)*1e6/10)
+	k = -0.26
+	lum = np.power(10, (k - mag) / 2.5) * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12 *100# note that lum_d is in unit of Mpc
+	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
+	mass = np.log10(lum) + np.log10(5)
+	return mass
 	
 def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the mass of a galaxy given its apparent magnitude and the redshift
@@ -106,12 +127,13 @@ def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h', 0.7)
 	# First calculate the luminosity from the apparent magnitude and redshift
-	# a const. for setting a reference point for magnitude, which will return the luminosity in the unit of solar luminosity
-	k = -3.01 
-	lum = np.power(10, (k - mag) / 2.5) * 4 * np.pi * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12 # note that lum_d is in unit of Mpc
-	# Then calculate and return mass by multiplying luminosity by 3
-	return 1 / 3 * np.log10(lum)
-	
+	# k is a const. for setting a reference point for magnitude, which will return the luminosity in the unit of solar luminosity
+	k = -0.26
+	lum = np.power(10, (k - mag) / 2.5) * lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)**2 * 1e12 *100# note that lum_d is in unit of Mpc
+	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
+	mass = np.log10(lum) + np.log10(5)
+	return mass
+
 def galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the number density of galaxies as a function of redshift for a given magnitude limit with given cosmology model
 	# In the unit of Mpc^-3
@@ -128,8 +150,8 @@ def delta_galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m,
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
 	h = kwargs.get('h', 0.7)
-	number_lambda = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, 0.3, 0, 0.7, 'LCDM') * comoving_vol_elm(z, 0.3, 0, 0.7, 'LCDM') * h / 3000
-	number = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * h /3000
+	number_lambda = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, 0.3, 0, 0.7, 'LCDM') * comoving_vol_elm(z, 0.3, 0, 0.7, 'LCDM')
+	number = galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) * comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)
 	return number - number_lambda
 
 
@@ -147,13 +169,13 @@ mag_to_mass_vec = np.vectorize(mag_to_mass)
 # Set the Hubbles constant
 h_today = 0.7
 
-# print("Constant magnitude=21, varying redshift")
-# print(np.array([0.1, 1, 2, 3]))
-# print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM'))
+print("Constant magnitude=21, varying redshift")
+print(np.array([0.1, 1, 2, 3]))
+print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM'))
 
-# print("Constant z=0.1, varying magnitude")
-# print(np.array([15, 20, 25, 30]))
-# print(mag_to_mass_vec(np.array([15, 20, 25, 30]), 0.1, 'LCDM'))
+print("Constant z=0.1, varying magnitude")
+print(np.array([15, 20, 25, 30]))
+print(mag_to_mass_vec(np.array([15, 20, 25, 30]), 0.1, 0.3, 0, 0.7, 'LCDM'))
 
 # -------------------------Plotting stuff------------------------------------
 z = np.linspace(0.01,3,100)
@@ -172,6 +194,20 @@ z = np.linspace(0.01,3,100)
 # ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) / (3000/h_today)**3, ':', label='w = -1.2')
 # plt.grid()
 # fig1.legend()
+
+
+# fig1_1, ax1_1 = plt.subplots()
+# ax1_1.set_xlabel("Redshift z")
+# ax1_1.set_ylabel(r"Dimensionless comoving volume element $\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$")
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM') # LCDM
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS') # E-deS
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', label='OCDM') # OCDM
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+# plt.grid()
+# fig1_1.legend()
 
 # ------------------Angular diameter distance---------------------------
 # fig2, ax2 = plt.subplots()
@@ -254,4 +290,4 @@ plt.grid()
 
 
 
-#plt.show()
+plt.show()
