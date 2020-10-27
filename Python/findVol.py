@@ -147,8 +147,13 @@ mag_to_mass_vec = np.vectorize(mag_to_mass)
 # Set the Hubbles constant
 h_today = 0.7
 
+# print("Constant magnitude=21, varying redshift")
+# print(np.array([0.1, 1, 2, 3]))
+# print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM'))
 
-print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM'))
+# print("Constant z=0.1, varying magnitude")
+# print(np.array([15, 20, 25, 30]))
+# print(mag_to_mass_vec(np.array([15, 20, 25, 30]), 0.1, 'LCDM'))
 
 # -------------------------Plotting stuff------------------------------------
 z = np.linspace(0.01,3,100)
@@ -212,9 +217,11 @@ ax4.set_yscale('log')
 plt.grid()
 
 #-------------------Plot of difference in no. density of galaxies btw LCDM and a given model----
-magnitude_min = 21
+#dN/dz dOmega
+magnitude_min = 25
+one_sqr_degree = (np.pi/180)**2 / (4*np.pi)
 fig5, ax5 = plt.subplots()
-ax5.set_ylabel(r"$\Delta \frac{dN}{dz}$")
+ax5.set_ylabel(r"$\Delta \frac{dN}{dz d \Omega}$")
 ax5.set_xlabel(r"$z$")
 ax5.set_title("min. app. magnitude = " + str(magnitude_min) + ", over all sky")
 ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM'), '-', label='LCDM')
@@ -228,5 +235,23 @@ ax5.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -
 fig5.legend()
 plt.grid()
 
+#------------------------Plot of dN/dz for one square degree region on the sky--------------
+fig6, ax6 = plt.subplots()
+ax6.set_ylabel(r"$\Delta \frac{dN}{dz}$")
+ax6.set_xlabel(r"$z$")
+ax6.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM') * one_sqr_degree, '-', label='LCDM')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM',) * one_sqr_degree, '--', label='E-deS')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM',) * one_sqr_degree, '-', label='OCDM')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+ax6.plot(z, delta_galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
 
-plt.show()
+fig6.legend()
+plt.grid()
+
+
+
+
+#plt.show()
