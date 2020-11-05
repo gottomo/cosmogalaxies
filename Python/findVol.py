@@ -124,7 +124,20 @@ def appmag_to_absmag(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	mag_abs = mag - 5 * np.log10(lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h) *1e6 / 10)
 	return mag_abs
 
-def mag_to_massaa(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
+def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
+	# Returns the mass of a galaxy given its apparent magnitude and the redshift
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
+	h = kwargs.get('h')
+	# First calculate the luminosity from the apparent magnitude and redshift
+	dm = 5 * np.log10(lum_d(z, omega_m, omega_k, omega_0, model, w_0 = w_0, w_1 = w_1, h = h)*1e6 /10)
+	lum = np.power(10, (4.74 + dm - mag) / 2.5)  # note that lum_d is in unit of Mpc
+	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
+	#mass = np.log10(lum) + np.log10(5)
+	mass = np.log10(lum) + np.log10(5)
+	return mass
+
+def mag_to_mass_notlog(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the mass of a galaxy given its apparent magnitude and the redshift
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
@@ -134,10 +147,11 @@ def mag_to_massaa(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	lum = np.power(10, (4.74 + dm - mag) / 2.5)  # note that lum_d is in unit of Mpc
 	# Then calculate and return mass by multiplying luminosity with mass-to-light ratio to get mass (note that mass is actually in log scale, so have to modify the equation as below
 	#mass = np.log10(lum) + np.log10(5)
-	mass = np.log10(lum) + np.log10(5)
+	mass = lum * 5
 	return mass
 
-def mag_to_mass(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
+
+def mag_to_massaa(mag, z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the mass of a galaxy given its apparent magnitude and the redshift
 	w_0 = kwargs.get('w_0')
 	w_1 = kwargs.get('w_1')
@@ -229,16 +243,16 @@ appmag_to_absmag_vec = np.vectorize(appmag_to_absmag)
 # Set the Hubbles constant
 h_today = 0.7
 
-print("Constant magnitude=21, varying redshift")
-print(np.array([0.1, 1, 2, 3]))
-print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM', h = h_today))
+# print("Constant magnitude=21, varying redshift")
+# print(np.array([0.1, 1, 2, 3]))
+# print(mag_to_mass_vec(21, np.array([0.1, 1, 2, 3]), 0.3, 0, 0.7, 'LCDM', h = h_today))
 
 # print("Constant z=0.1, varying magnitude")
 # print(np.array([15, 20, 25, 30]))
 # print(mag_to_mass_vec(np.array([15, 20, 25, 30]), 0.1, 0.3, 0, 0.7, 'LCDM'))
 
 # -------------------------Plotting stuff------------------------------------
-z = np.linspace(0.01,5,50)
+z = np.linspace(0.01,3,50)
 
 # ---------------------------Comoving volume element------------------------------
 # Plots of comoving volume element per uint solid angle per unit redshift, normalized by 1/(D_H)^3
@@ -314,7 +328,7 @@ mass_dex_array = np.linspace(7,12,200)
 
 #-------------------Plot of difference in no. density of galaxies btw LCDM and a given model----
 #dN/dz dOmega
-magnitude_min = 25
+magnitude_min = 28
 one_sqr_degree = (np.pi/180)**2 
 # fig5, ax5 = plt.subplots()
 # ax5.set_ylabel(r"$\Delta \frac{dN}{dz d \Omega}$")
@@ -375,7 +389,6 @@ ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w',
 ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
 ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
 ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
-
 
 fig8.legend(loc = 'center right')
 plt.grid()
