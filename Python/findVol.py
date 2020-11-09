@@ -187,6 +187,64 @@ def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b
 	return a * z + b
 	
+#---------------- functions for galaxy mergers--------------------------------------
+def LBTime(z, omega_m, omega_k, omega_0, model, h=0.7):
+    t_H = 9.78 * h
+    
+    
+    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model)), 0, z) # integration holds error
+    return integral[0] * t_H #* (1/100*h) # Want this in GIGAYEAR
+
+def Pair_Fraction(z, mass):
+    a = 0
+    M = 0
+    
+    if mass < 9.7:
+        print("Galaxy mass too low, merger rate unknown")
+    elif mass < 10.3:
+        M = 0.024
+        a = 1.8
+    else:
+        M = 0.032
+        a = 0.8
+    
+    return M*(1+z)**a
+
+def Merger_Rate_Snyder(z, mass): # Looks good
+
+    return (Pair_Fraction(z,mass) * (1+z) ** 2) / 2.4
+
+def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+    # This phi calculation integrates the Snyder approximation, which lets us 
+    # directly access phi for a given z, without iteratively calculating
+    # every previous phi value. This just makes it neater, and more in line
+    # with the style of functions already in the code, which return one
+    # value and then are vectorized.
+    
+    t_H = 9.78 * h
+    
+    
+    if mass < 9.7: # Depending on mass, choose the parameters of the
+        # pair fraction function
+        print("Galaxy mass too low, merger rate unknown")
+    elif mass < 10.3:
+        M = 0.024
+        a = 1.8
+    else:
+        M = 0.032
+        a = 0.8
+    
+    
+    # integrate the Snyder approximation to find how much phi should change.
+    
+    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model))), 0, z) # integration holds error
+    
+    
+    return np.exp(integral[0]) * OriginalPhi
+
+Merger_Rate_SnyderVec = np.vectorize(Merger_Rate_Snyder)
+
+
 # Vectorizes the functions I want to plot with matplotlib, so that function can accept np arrays
 comoving_vol_elm_vec = np.vectorize(comoving_vol_elm)
 delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
@@ -201,6 +259,8 @@ delta_galaxy_number_z_vec = np.vectorize(delta_galaxy_number_z)
 delta_galaxy_number_rel_z_vec = np.vectorize(delta_galaxy_number_rel_z)
 appmag_to_absmag_vec = np.vectorize(appmag_to_absmag)
 alpha_vec = np.vectorize(alpha)
+LBTimeVec = np.vectorize(LBTime)
+
 
 # ------------------------------------------Set the constants-------------------------------------------
 h_today = 0.7
@@ -516,6 +576,20 @@ ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.
 ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
 
 fig15.legend()
+plt.grid()
+
+#------------Plot of minimum mass of galaxies observable for a given magnitude thres.-----------
+fig16, ax16 = plt.subplots()
+ax16.set_ylabel(r"Mass (dex)")
+ax16.set_xlabel(r"$z$")
+ax16.set_title('The lightest galaxy observable in LCDM \n for different apparent magnitude thresholds between 21~35')
+ax16.plot(z, mag_to_mass_vec(21, z, 0.3, 0, 0.7, 'LCDM', h=h_today), ':', label='m=21')
+ax16.plot(z, mag_to_mass_vec(25, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '--', label='m=25')
+ax16.plot(z, mag_to_mass_vec(28, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='m=28')
+ax16.plot(z, mag_to_mass_vec(30, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-.', label='m=30')
+ax16.plot(z, mag_to_mass_vec(35, z, 0.3, 0, 0.7, 'LCDM', h=h_today), ':', label='m=35')
+
+fig16.legend(loc = 'center right')
 plt.grid()
 
 
