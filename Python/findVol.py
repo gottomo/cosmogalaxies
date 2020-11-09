@@ -237,7 +237,7 @@ def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w
     
     # integrate the Snyder approximation to find how much phi should change.
     
-    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model))), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h))), 0, z) # integration holds error
     
     
     return np.exp(integral[0]) * OriginalPhi
@@ -260,6 +260,7 @@ delta_galaxy_number_rel_z_vec = np.vectorize(delta_galaxy_number_rel_z)
 appmag_to_absmag_vec = np.vectorize(appmag_to_absmag)
 alpha_vec = np.vectorize(alpha)
 LBTimeVec = np.vectorize(LBTime)
+Phi_directVec = np.vectorize(Phi_direct)
 
 
 # ------------------------------------------Set the constants-------------------------------------------
@@ -267,6 +268,9 @@ h_today = 0.7
 magnitude_min = 28
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 3
+
+modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
+
 
 # print("Constant magnitude=21, varying redshift")
 # print(np.array([0.1, 1, 2, 3]))
@@ -386,20 +390,20 @@ mass_dex_array = np.linspace(7,12,200)
 # plt.grid()
 
 #---------------Plot of absolute number of galaxies per sqd---------------
-fig7, ax7 = plt.subplots()
-ax7.set_ylabel(r"$\frac{dN}{dz}$")
-ax7.set_xlabel(r"$z$")
-ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
+# fig7, ax7 = plt.subplots()
+# ax7.set_ylabel(r"$\frac{dN}{dz}$")
+# ax7.set_xlabel(r"$z$")
+# ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
 
-fig7.legend()
-plt.grid()
+# fig7.legend()
+# plt.grid()
 
 #------------Plot of minimum mass of galaxies observable for a given magnitude thres.-----------
 # fig8, ax8 = plt.subplots()
@@ -465,69 +469,87 @@ plt.grid()
 # plt.grid()
 
 #---------------Plot of difference in number of galaxies with respect to some z---------------
-fig11, ax11 = plt.subplots()
-ax11.set_ylabel(r"Difference in $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
-ax11.set_xlabel(r"$z$")
-ax11.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
-ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
+# fig11, ax11 = plt.subplots()
+# ax11.set_ylabel(r"Difference in $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+# ax11.set_xlabel(r"$z$")
+# ax11.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+# ax11.plot(z, delta_galaxy_number_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
 
-fig11.legend()
-plt.grid()
+# fig11.legend()
+# plt.grid()
 
 # Relative difference
-fig12, ax12 = plt.subplots()
-ax12.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
-ax12.set_xlabel(r"$z$")
-ax12.set_title("min. app. magnitude = " + str(magnitude_min))
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+# fig12, ax12 = plt.subplots()
+# ax12.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+# ax12.set_xlabel(r"$z$")
+# ax12.set_title("min. app. magnitude = " + str(magnitude_min))
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax12.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
 
-fig12.legend()
-plt.grid()
+# fig12.legend()
+# plt.grid()
 
 # -----------------------Plot of single Schechter function at different z using varying alpha--------------------
 # Don't need to define separate function for single Shcechter function, because all we need to do is to set the parameter phi2 of double Schechter funtion to 0 (phi2 = 0)
-mass_dex_array = np.linspace(7,12,200)
-fig13, ax13 = plt.subplots()
-ax13.set_xlabel(r"$M$ $(dex)$")
-ax13.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {Mpc}^{-3}$)")
-ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), 0), '-', label='z=0')
-# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(0.5, -0.093, -1.3), 0), label='z=0.5')
-ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(1, -0.093, -1.3), 0), '--', label='z=1')
-# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(1.5, -0.093, -1.3), 0), label='z=1.5')
-ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(2, -0.093, -1.3), 0), '-.', label='z=2')
-# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(2.5, -0.093, -1.3), 0), label='z=2.5')
-ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(3, -0.093, -1.3), 0), ':', label='z=3')
-ax13.set_yscale('log')
-fig13.legend()
-plt.grid()
+# mass_dex_array = np.linspace(7,12,200)
+# fig13, ax13 = plt.subplots()
+# ax13.set_xlabel(r"$M$ $(dex)$")
+# ax13.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {Mpc}^{-3}$)")
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), 0), '-', label='z=0')
+# # ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(0.5, -0.093, -1.3), 0), label='z=0.5')
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(1, -0.093, -1.3), 0), '--', label='z=1')
+# # ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(1.5, -0.093, -1.3), 0), label='z=1.5')
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(2, -0.093, -1.3), 0), '-.', label='z=2')
+# # ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(2.5, -0.093, -1.3), 0), label='z=2.5')
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(3, -0.093, -1.3), 0), ':', label='z=3')
+# ax13.set_yscale('log')
+# fig13.legend()
+# plt.grid()
 
 # Relative difference using varyig alpha
-# fig14, ax14 = plt.subplots()
-# ax14.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
-# ax14.set_xlabel(r"$z$")
-# ax14.set_title("min. app. magnitude = " + str(magnitude_min))
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-# ax14.plot(z, delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
 
-# fig14.legend()
-# plt.grid()
+# Write data to file, 1st row: z, 2nd row: rel_num_<model>
+models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
+i=0
+for model in models:
+	datafile=open("RelDif_varAlpha_zref" + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
+	data = np.stack((z, model), axis=1)
+	np.savetxt(datafile, data)
+	datafile.close()
+	i=i+1
+
+fig14, ax14 = plt.subplots()
+ax14.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+ax14.set_xlabel(r"$z$")
+ax14.set_title("min. app. magnitude = " + str(magnitude_min))
+ax14.plot(z, rel_num_LCDM, '-', label='LCDM')
+ax14.plot(z, rel_num_EdS, '--', label='E-deS')
+ax14.plot(z, rel_num_OCDM, '-', label='OCDM')
+ax14.plot(z, rel_num_w8, ':', label='w = -0.8')
+ax14.plot(z, rel_num_w9, ':', label='w = -0.9')
+ax14.plot(z, rel_num_w11, ':', label='w = -1.1')
+ax14.plot(z, rel_num_w12, ':', label='w = -1.2')
+
+fig14.legend()
+plt.grid()
 
 # Relative difference using constant alpha
 # fig14_1, ax14_1 = plt.subplots()
@@ -546,51 +568,181 @@ plt.grid()
 # plt.grid()
 
 #---------------Plot of absolute number of galaxies per sqd with varying alpha---------------
-fig15_1, ax15_1 = plt.subplots()
-ax15_1.set_ylabel(r"$\frac{dN}{dz}$")
-ax15_1.set_xlabel(r"$z$")
-ax15_1.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+# fig15_1, ax15_1 = plt.subplots()
+# ax15_1.set_ylabel(r"$\frac{dN}{dz}$")
+# ax15_1.set_xlabel(r"$z$")
+# ax15_1.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax15_1.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
 
-fig15_1.legend()
-plt.grid()
+# fig15_1.legend()
+# plt.grid()
 
 
 #---------------Plot of absolute number of galaxies per sqd with constant alpha---------------
-fig15, ax15 = plt.subplots()
-ax15.set_ylabel(r"$\frac{dN}{dz}$")
-ax15.set_xlabel(r"$z$")
-ax15.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+# fig15, ax15 = plt.subplots()
+# ax15.set_ylabel(r"$\frac{dN}{dz}$")
+# ax15.set_xlabel(r"$z$")
+# ax15.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax15.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 2.88e-3, 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
 
-fig15.legend()
-plt.grid()
+# fig15.legend()
+# plt.grid()
 
 #------------Plot of minimum mass of galaxies observable for a given magnitude thres.-----------
-fig16, ax16 = plt.subplots()
-ax16.set_ylabel(r"Mass (dex)")
-ax16.set_xlabel(r"$z$")
-ax16.set_title('The lightest galaxy observable in LCDM \n for different apparent magnitude thresholds between 21~35')
-ax16.plot(z, mag_to_mass_vec(21, z, 0.3, 0, 0.7, 'LCDM', h=h_today), ':', label='m=21')
-ax16.plot(z, mag_to_mass_vec(25, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '--', label='m=25')
-ax16.plot(z, mag_to_mass_vec(28, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='m=28')
-ax16.plot(z, mag_to_mass_vec(30, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-.', label='m=30')
-ax16.plot(z, mag_to_mass_vec(35, z, 0.3, 0, 0.7, 'LCDM', h=h_today), ':', label='m=35')
+# fig16, ax16 = plt.subplots()
+# ax16.set_ylabel(r"Mass (dex)")
+# ax16.set_xlabel(r"$z$")
+# ax16.set_title('The lightest galaxy observable in LCDM \n for different apparent magnitude thresholds between 21~35')
+# ax16.plot(z, mag_to_mass_vec(21, z, 0.3, 0, 0.7, 'LCDM', h=h_today), ':', label='m=21')
+# ax16.plot(z, mag_to_mass_vec(25, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '--', label='m=25')
+# ax16.plot(z, mag_to_mass_vec(28, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='m=28')
+# ax16.plot(z, mag_to_mass_vec(30, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-.', label='m=30')
+# ax16.plot(z, mag_to_mass_vec(35, z, 0.3, 0, 0.7, 'LCDM', h=h_today), ':', label='m=35')
 
-fig16.legend(loc = 'center right')
+# fig16.legend(loc = 'center right')
+# plt.grid()
+
+#-----------Plot of parameter phi for single Schechter function as a function of z----------------
+fig16_1, ax16_1 = plt.subplots()
+ax16_1.plot(z, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), label = "Snyder integrated")
+# plt.title("Evolution of number density phi due to mergers, for Galaxies log(M)>10.3")
+
+# plt.yscale("Log")
+
+# plt.ylabel("Number density $\Phi$ ($Mpc^{-1}$)")
+# plt.xlabel("Redshift z")
+
+# plt.legend()
+
+
+#--------------------Investigating the behaviour of relative no. of galaxy subject to galaxy mergers only--------------------
+
+# Relative difference using varyig phi
+rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
+
+# Write data to file, 1st row: z, 2nd row: rel_num_<model>
+models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
+i=0
+for model in models:
+	datafile=open("RelDif_varPhi_zref" + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
+	data = np.stack((z, model), axis=1)
+	np.savetxt(datafile, data)
+	datafile.close()
+	i=i+1
+
+fig17, ax17 = plt.subplots()
+ax17.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+ax17.set_xlabel(r"$z$")
+ax17.set_title("min. app. magnitude = " + str(magnitude_min))
+ax17.plot(z, rel_num_LCDM, '-', label='LCDM')
+ax17.plot(z, rel_num_EdS, '--', label='E-deS')
+ax17.plot(z, rel_num_OCDM, '-', label='OCDM')
+ax17.plot(z, rel_num_w8, ':', label='w = -0.8')
+ax17.plot(z, rel_num_w9, ':', label='w = -0.9')
+ax17.plot(z, rel_num_w11, ':', label='w = -1.1')
+ax17.plot(z, rel_num_w12, ':', label='w = -1.2')
+
+fig17.legend()
 plt.grid()
 
+# Relative difference using constant phi (actually same as fig14_1, where the alpha is set constant, so in a way plotting this is unnecessary)
+rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
+
+# Write data to file, 1st row: z, 2nd row: rel_num_<model>
+models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
+i=0
+for model in models:
+	datafile=open("RelDif_constPhiAlpha_zref" + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
+	data = np.stack((z, model), axis=1)
+	np.savetxt(datafile, data)
+	datafile.close()
+	i=i+1
+
+fig18, ax18 = plt.subplots()
+ax18.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+ax18.set_xlabel(r"$z$")
+ax18.set_title("min. app. magnitude = " + str(magnitude_min))
+ax18.plot(z, rel_num_LCDM, '-', label='LCDM')
+ax18.plot(z, rel_num_EdS, '--', label='E-deS')
+ax18.plot(z, rel_num_OCDM, '-', label='OCDM')
+ax18.plot(z, rel_num_w8, ':', label='w = -0.8')
+ax18.plot(z, rel_num_w9, ':', label='w = -0.9')
+ax18.plot(z, rel_num_w11, ':', label='w = -1.1')
+ax18.plot(z, rel_num_w12, ':', label='w = -1.2')
+
+fig18.legend()
+plt.grid()
+
+#---------------Plot of absolute number of galaxies per sqd with varying phi---------------
+fig19, ax19 = plt.subplots()
+ax19.set_ylabel(r"$\frac{dN}{dz}$")
+ax19.set_xlabel(r"$z$")
+ax19.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+ax19.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+
+fig19.legend()
+plt.grid()
+
+
+#---------------Plot of absolute number of galaxies per sqd with constant phi---------------
+fig20, ax20 = plt.subplots()
+ax20.set_ylabel(r"$\frac{dN}{dz}$")
+ax20.set_xlabel(r"$z$")
+ax20.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+
+fig20.legend()
+plt.grid()
+
+# ---------------Plots of Schechter function at different redshift for varying phi
+fig21, ax21 = plt.subplots()
+ax21.set_xlabel(r"$M$ $(dex)$")
+ax21.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {Mpc}^{-3}$)")
+ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '-', label='z=0')
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(0.5, -0.093, -1.3), 0), label='z=0.5')
+ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(1, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '--', label='z=1')
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(1.5, -0.093, -1.3), 0), label='z=1.5')
+ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(2, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '-.', label='z=2')
+# ax13.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, 2.88e-3, 0, alpha(2.5, -0.093, -1.3), 0), label='z=2.5')
+ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), ':', label='z=3')
+ax21.set_yscale('log')
+fig21.legend()
+plt.grid()
 
 plt.show()
