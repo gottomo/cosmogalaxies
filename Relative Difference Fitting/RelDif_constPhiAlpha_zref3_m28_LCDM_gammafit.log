@@ -1,0 +1,419 @@
+
+
+*******************************************************************************
+Tue Nov 10 17:26:00 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(z)
+	f(z)=a*(1+z)**m*exp(b*(1+z))
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Tue Nov 10 17:26:32 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 3.2481258755e+05   0.00e+00  1.89e+02    1.000000e+00   1.000000e+00   1.000000e+00
+  78 7.0900857243e+00  -2.58e-01  1.89e-07    1.334500e+02   1.041518e+01  -5.375925e+00
+
+After 78 iterations the fit converged.
+final sum of squares of residuals : 7.09009
+rel. change during last iteration : -2.58116e-06
+
+degrees of freedom    (FIT_NDF)                        : 47
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.388398
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.150853
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 133.45           +/- 36.47        (27.33%)
+m               = 10.4152          +/- 0.7719       (7.411%)
+b               = -5.37592         +/- 0.39         (7.255%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.908  1.000 
+b              -0.957 -0.990  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:33:57 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)[0.5:]
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Tue Nov 10 17:34:12 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.500000 : *]
+        #datapoints = 41
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 1.6043476434e+00   0.00e+00  1.94e+01    1.334500e+02   1.041518e+01  -5.375925e+00
+   9 2.2313944550e-01  -2.10e-01  1.94e-05    6.183526e+01   6.777598e+00  -3.753019e+00
+
+After 9 iterations the fit converged.
+final sum of squares of residuals : 0.223139
+rel. change during last iteration : -2.10136e-06
+
+degrees of freedom    (FIT_NDF)                        : 38
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0766296
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00587209
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 61.8353          +/- 3.505        (5.668%)
+m               = 6.7776           +/- 0.2288       (3.376%)
+b               = -3.75302         +/- 0.1043       (2.779%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.891  1.000 
+b              -0.937 -0.993  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:35:11 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.800000 : *]
+        #datapoints = 37
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 2.1903675480e-01   0.00e+00  1.31e+01    6.183526e+01   6.777598e+00  -3.753019e+00
+   5 2.1433245224e-01  -7.38e-01  1.31e-04    6.281218e+01   7.024933e+00  -3.848556e+00
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 0.214332
+rel. change during last iteration : -7.38117e-06
+
+degrees of freedom    (FIT_NDF)                        : 34
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0793971
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.0063039
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 62.8122          +/- 4.129        (6.573%)
+m               = 7.02493          +/- 0.3814       (5.43%)
+b               = -3.84856         +/- 0.1616       (4.2%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.836  1.000 
+b              -0.885 -0.995  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:36:11 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [1.00000 : *]
+        #datapoints = 33
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 2.0686748949e-01   0.00e+00  1.26e+01    6.281218e+01   7.024933e+00  -3.848556e+00
+   7 1.7113093789e-01  -1.21e-01  1.26e-06    6.390712e+01   8.326313e+00  -4.328027e+00
+
+After 7 iterations the fit converged.
+final sum of squares of residuals : 0.171131
+rel. change during last iteration : -1.21218e-06
+
+degrees of freedom    (FIT_NDF)                        : 30
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0755272
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00570436
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 63.9071          +/- 4.277        (6.692%)
+m               = 8.32631          +/- 0.6318       (7.588%)
+b               = -4.32803         +/- 0.2498       (5.771%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.660  1.000 
+b              -0.719 -0.997  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:36:48 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [1.50000 : *]
+        #datapoints = 25
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 1.4961897383e-01   0.00e+00  1.11e+01    6.390712e+01   8.326313e+00  -4.328027e+00
+ 113 7.2486041471e-02  -9.68e-01  1.11e-01    3.331902e+01   1.594263e+01  -6.883337e+00
+
+After 113 iterations the fit converged.
+final sum of squares of residuals : 0.072486
+rel. change during last iteration : -9.68124e-06
+
+degrees of freedom    (FIT_NDF)                        : 22
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0574005
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00329482
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 33.319           +/- 4.816        (14.46%)
+m               = 15.9426          +/- 1.796        (11.26%)
+b               = -6.88334         +/- 0.6328       (9.193%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m              -0.733  1.000 
+b               0.694 -0.998  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:55:14 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.500000 : 2.50000]
+        #datapoints = 32
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 9.6587275127e-02   0.00e+00  1.53e+01    6.281218e+01   7.024933e+00  -3.848556e+00
+   6 2.1492359471e-02  -2.16e-04  1.53e-05    5.255122e+01   6.190562e+00  -3.472349e+00
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 0.0214924
+rel. change during last iteration : -2.15559e-09
+
+degrees of freedom    (FIT_NDF)                        : 29
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0272234
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000741116
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 52.5512          +/- 1.204        (2.291%)
+m               = 6.19056          +/- 0.09009      (1.455%)
+b               = -3.47235         +/- 0.0415       (1.195%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.914  1.000 
+b              -0.950 -0.994  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:56:21 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.700000 : 2.50000]
+        #datapoints = 29
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 1.5865210283e-02   0.00e+00  1.39e+01    5.255122e+01   6.190562e+00  -3.472349e+00
+   5 1.1029121619e-02  -1.21e-03  1.39e+00    5.061465e+01   5.893453e+00  -3.350078e+00
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 0.0110291
+rel. change during last iteration : -1.20985e-08
+
+degrees of freedom    (FIT_NDF)                        : 26
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.020596
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000424197
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 50.6146          +/- 0.9869       (1.95%)
+m               = 5.89345          +/- 0.09915      (1.682%)
+b               = -3.35008         +/- 0.04327      (1.292%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.892  1.000 
+b              -0.929 -0.996  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:57:17 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.500000 : 2.20000]
+        #datapoints = 27
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 3.3387636956e-02   0.00e+00  1.43e+01    5.061465e+01   5.893453e+00  -3.350078e+00
+   5 1.6963251587e-02  -4.39e-02  1.43e-04    5.095623e+01   6.086048e+00  -3.421410e+00
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 0.0169633
+rel. change during last iteration : -4.39191e-07
+
+degrees of freedom    (FIT_NDF)                        : 24
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0265858
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000706802
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 50.9562          +/- 1.412        (2.77%)
+m               = 6.08605          +/- 0.103        (1.693%)
+b               = -3.42141         +/- 0.04844      (1.416%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.937  1.000 
+b              -0.965 -0.996  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:57:56 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.600000 : 2.20000]
+        #datapoints = 26
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 1.0824407477e-02   0.00e+00  1.47e+01    5.095623e+01   6.086048e+00  -3.421410e+00
+   5 7.3280882595e-03  -8.85e-01  1.47e-04    4.922610e+01   5.878464e+00  -3.332351e+00
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 0.00732809
+rel. change during last iteration : -8.85356e-06
+
+degrees of freedom    (FIT_NDF)                        : 23
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0178497
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000318613
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 49.2261          +/- 0.9683       (1.967%)
+m               = 5.87846          +/- 0.07875      (1.34%)
+b               = -3.33235         +/- 0.03638      (1.092%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.935  1.000 
+b              -0.962 -0.996  1.000 
+
+
+*******************************************************************************
+Tue Nov 10 17:58:43 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.700000 : 2.20000]
+        #datapoints = 24
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 4.7065800191e-03   0.00e+00  1.43e+01    4.922610e+01   5.878464e+00  -3.332351e+00
+   6 1.4982445966e-03  -1.07e-02  1.43e-05    4.728463e+01   5.599107e+00  -3.214982e+00
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 0.00149824
+rel. change during last iteration : -1.07471e-07
+
+degrees of freedom    (FIT_NDF)                        : 21
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0084466
+variance of residuals (reduced chisquare) = WSSR/ndf   : 7.1345e-05
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 47.2846          +/- 0.4947       (1.046%)
+m               = 5.59911          +/- 0.04949      (0.8838%)
+b               = -3.21498         +/- 0.02206      (0.6863%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.928  1.000 
+b              -0.954 -0.997  1.000 
