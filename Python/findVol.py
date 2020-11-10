@@ -266,10 +266,10 @@ Phi_directVec = np.vectorize(Phi_direct)
 
 # ------------------------------------------Set the constants-------------------------------------------
 h_today = 0.7
-magnitude_min = 28
+magnitude_min = 32
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 3
-z = np.linspace(0.01,6,100)
+z = np.linspace(0.01,3,50)
 
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
 
@@ -706,6 +706,20 @@ for model in models:
 	i=i+1
 	datafile.close()
 
+fig18, ax18 = plt.subplots()
+ax18.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+ax18.set_xlabel(r"$z$")
+ax18.set_title("min. app. magnitude = " + str(magnitude_min))
+ax18.plot(z, rel_num_LCDM, '-', label='LCDM')
+ax18.plot(z, rel_num_EdS, '--', label='E-deS')
+ax18.plot(z, rel_num_OCDM, '-', label='OCDM')
+ax18.plot(z, rel_num_w8, ':', label='w = -0.8')
+ax18.plot(z, rel_num_w9, ':', label='w = -0.9')
+ax18.plot(z, rel_num_w11, ':', label='w = -1.1')
+ax18.plot(z, rel_num_w12, ':', label='w = -1.2')
+
+fig18.legend()
+plt.grid()
 
 # ----------------------Create plot of maximum separation as a function of reference redshift---------------------------------------------------
 # max_sepArray = np.array([])
@@ -765,20 +779,6 @@ for model in models:
 #---------------------------------------------------------------------------------------------------------------------
 
 
-# fig18, ax18 = plt.subplots()
-# ax18.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
-# ax18.set_xlabel(r"$z$")
-# ax18.set_title("min. app. magnitude = " + str(magnitude_min))
-# ax18.plot(z, rel_num_LCDM, '-', label='LCDM')
-# ax18.plot(z, rel_num_EdS, '--', label='E-deS')
-# ax18.plot(z, rel_num_OCDM, '-', label='OCDM')
-# ax18.plot(z, rel_num_w8, ':', label='w = -0.8')
-# ax18.plot(z, rel_num_w9, ':', label='w = -0.9')
-# ax18.plot(z, rel_num_w11, ':', label='w = -1.1')
-# ax18.plot(z, rel_num_w12, ':', label='w = -1.2')
-
-# fig18.legend()
-# plt.grid()
 
 #---------------Plot of absolute number of galaxies per sqd with varying phi---------------
 # fig19, ax19 = plt.subplots()
