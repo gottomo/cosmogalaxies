@@ -1,0 +1,79 @@
+
+
+*******************************************************************************
+Note: the best fit out of all, with smallest relative error
+Tue Nov 10 17:58:43 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        x range restricted to [0.700000 : 2.20000]
+        #datapoints = 24
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 4.7065800191e-03   0.00e+00  1.43e+01    4.922610e+01   5.878464e+00  -3.332351e+00
+   6 1.4982445966e-03  -1.07e-02  1.43e-05    4.728463e+01   5.599107e+00  -3.214982e+00
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 0.00149824
+rel. change during last iteration : -1.07471e-07
+
+degrees of freedom    (FIT_NDF)                        : 21
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0084466
+variance of residuals (reduced chisquare) = WSSR/ndf   : 7.1345e-05
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 47.2846          +/- 0.4947       (1.046%)
+m               = 5.59911          +/- 0.04949      (0.8838%)
+b               = -3.21498         +/- 0.02206      (0.6863%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.928  1.000 
+b              -0.954 -0.997  1.000 
+
+
+*******************************************************************************
+Note: Fit for all range of z, which inevitably makes this the worst fit
+Tue Nov 10 17:26:32 2020
+
+
+FIT:    data read from "RelDif_constPhiAlpha_zref3_m28_LCDM.txt" us 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*(1+x)**m*exp(b*(1+x))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             m             b            
+   0 3.2481258755e+05   0.00e+00  1.89e+02    1.000000e+00   1.000000e+00   1.000000e+00
+  78 7.0900857243e+00  -2.58e-01  1.89e-07    1.334500e+02   1.041518e+01  -5.375925e+00
+
+After 78 iterations the fit converged.
+final sum of squares of residuals : 7.09009
+rel. change during last iteration : -2.58116e-06
+
+degrees of freedom    (FIT_NDF)                        : 47
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.388398
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.150853
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 133.45           +/- 36.47        (27.33%)
+m               = 10.4152          +/- 0.7719       (7.411%)
+b               = -5.37592         +/- 0.39         (7.255%)
+
+correlation matrix of the fit parameters:
+                a      m      b      
+a               1.000 
+m               0.908  1.000 
+b              -0.957 -0.990  1.000 
