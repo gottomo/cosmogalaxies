@@ -266,10 +266,10 @@ Phi_directVec = np.vectorize(Phi_direct)
 
 # ------------------------------------------Set the constants-------------------------------------------
 h_today = 0.7
-magnitude_min = 32
+magnitude_min = 28
 one_sqr_degree = (np.pi/180)**2 
-z_ref = 3
-z = np.linspace(0.01,3,50)
+z_ref = 6
+z = np.linspace(0.01,zref,50*z_ref/3)
 
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
 
@@ -706,20 +706,20 @@ for model in models:
 	i=i+1
 	datafile.close()
 
-fig18, ax18 = plt.subplots()
-ax18.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
-ax18.set_xlabel(r"$z$")
-ax18.set_title("min. app. magnitude = " + str(magnitude_min))
-ax18.plot(z, rel_num_LCDM, '-', label='LCDM')
-ax18.plot(z, rel_num_EdS, '--', label='E-deS')
-ax18.plot(z, rel_num_OCDM, '-', label='OCDM')
-ax18.plot(z, rel_num_w8, ':', label='w = -0.8')
-ax18.plot(z, rel_num_w9, ':', label='w = -0.9')
-ax18.plot(z, rel_num_w11, ':', label='w = -1.1')
-ax18.plot(z, rel_num_w12, ':', label='w = -1.2')
+# fig18, ax18 = plt.subplots()
+# ax18.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
+# ax18.set_xlabel(r"$z$")
+# ax18.set_title("min. app. magnitude = " + str(magnitude_min))
+# ax18.plot(z, rel_num_LCDM, '-', label='LCDM')
+# ax18.plot(z, rel_num_EdS, '--', label='E-deS')
+# ax18.plot(z, rel_num_OCDM, '-', label='OCDM')
+# ax18.plot(z, rel_num_w8, ':', label='w = -0.8')
+# ax18.plot(z, rel_num_w9, ':', label='w = -0.9')
+# ax18.plot(z, rel_num_w11, ':', label='w = -1.1')
+# ax18.plot(z, rel_num_w12, ':', label='w = -1.2')
 
-fig18.legend()
-plt.grid()
+# fig18.legend()
+# plt.grid()
 
 # ----------------------Create plot of maximum separation as a function of reference redshift---------------------------------------------------
 # max_sepArray = np.array([])
@@ -798,20 +798,20 @@ plt.grid()
 
 
 #---------------Plot of absolute number of galaxies per sqd with constant phi---------------
-# fig20, ax20 = plt.subplots()
-# ax20.set_ylabel(r"$\frac{dN}{dz}$")
-# ax20.set_xlabel(r"$z$")
-# ax20.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-# ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+fig20, ax20 = plt.subplots()
+ax20.set_ylabel(r"$\frac{dN}{dz}$")
+ax20.set_xlabel(r"$z$")
+ax20.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+ax20.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
 
-# fig20.legend()
-# plt.grid()
+fig20.legend()
+plt.grid()
 
 # ---------------Plots of Schechter function at different redshift for varying phi
 # fig21, ax21 = plt.subplots()
