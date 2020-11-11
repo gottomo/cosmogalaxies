@@ -190,7 +190,7 @@ def alpha(z, a, b):
 	
 #---------------- functions for galaxy mergers--------------------------------------
 def LBTime(z, omega_m, omega_k, omega_0, model, h=0.7):
-    t_H = 9.78 * h
+    t_H = 9.78 / h
     
     
     integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model)), 0, z) # integration holds error
@@ -222,7 +222,7 @@ def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w
     # with the style of functions already in the code, which return one
     # value and then are vectorized.
     
-    t_H = 9.78 * h
+    t_H = 9.78 / h
     
     
     if mass < 9.7: # Depending on mass, choose the parameters of the
