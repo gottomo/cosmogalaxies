@@ -522,30 +522,30 @@ mass_dex_array = np.linspace(7,12,200)
 # plt.grid()
 
 # ---------------------------------Relative difference using varyig alpha------------------------------
-rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
-rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
-rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
-rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
-rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
-rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
+# rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+# rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+# rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+# rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+# rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+# rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
 
-# Return the redshift at which maximum separation occurs
-sep = rel_num_LCDM - rel_num_w9
-max_sep = np.amax(np.abs(sep))
-z_max_sep_index = np.where(sep == max_sep)
-print("(Varying alpha) Max difference between LCDM and w=-0.9 at z = " + str(z[z_max_sep_index])) 
+# # Return the redshift at which maximum separation occurs
+# sep = rel_num_LCDM - rel_num_w9
+# max_sep = np.amax(np.abs(sep))
+# z_max_sep_index = np.where(sep == max_sep)
+# print("(Varying alpha) Max difference between LCDM and w=-0.9 at z = " + str(z[z_max_sep_index])) 
 
-# Write data to file, 1st row: z, 2nd row: rel_num_<model>
-models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
-i=0
-# print("Rel path is: " + os.path.join(cur_path, "RelDif//RelDif_varAlpha_zref"))
-for model in models:
-	datafile=open(os.path.join(cur_path, "RelDif//RelDif_varAlpha_zref") + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
-	data = np.stack((z, model), axis=1)
-	np.savetxt(datafile, data)
-	i=i+1
-	datafile.close()
+# # Write data to file, 1st row: z, 2nd row: rel_num_<model>
+# models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
+# i=0
+# # print("Rel path is: " + os.path.join(cur_path, "RelDif//RelDif_varAlpha_zref"))
+# for model in models:
+# 	datafile=open(os.path.join(cur_path, "RelDif//RelDif_varAlpha_zref") + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
+# 	data = np.stack((z, model), axis=1)
+# 	np.savetxt(datafile, data)
+# 	i=i+1
+# 	datafile.close()
 
 
 # fig14, ax14 = plt.subplots()
@@ -642,29 +642,29 @@ for model in models:
 #--------------------Investigating the behaviour of relative no. of galaxy subject to galaxy mergers only--------------------
 
 # Relative difference using varyig phi
-rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
-rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
-rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
-rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
-rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
-rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
+# rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+# rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+# rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+# rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+# rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+# rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
 
-# Return the redshift at which maximum separation occurs
-sep = rel_num_LCDM - rel_num_w9
-max_sep = np.amax(np.abs(sep))
-z_max_sep_index = np.where(sep == max_sep)
-print("(Varying phi) Max difference between LCDM and w=-0.9 at z = " + str(z[z_max_sep_index]))
+# # Return the redshift at which maximum separation occurs
+# sep = rel_num_LCDM - rel_num_w9
+# max_sep = np.amax(np.abs(sep))
+# z_max_sep_index = np.where(sep == max_sep)
+# print("(Varying phi) Max difference between LCDM and w=-0.9 at z = " + str(z[z_max_sep_index]))
 
-# Write data to file, 1st row: z, 2nd row: rel_num_<model>
-models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
-i=0
-for model in models:
-	datafile=open(os.path.join(cur_path, "RelDif//RelDif_varPhi_zref") + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
-	data = np.stack((z, model), axis=1)
-	np.savetxt(datafile, data)
-	i=i+1
-	datafile.close()
+# # Write data to file, 1st row: z, 2nd row: rel_num_<model>
+# models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
+# i=0
+# for model in models:
+# 	datafile=open(os.path.join(cur_path, "RelDif//RelDif_varPhi_zref") + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
+# 	data = np.stack((z, model), axis=1)
+# 	np.savetxt(datafile, data)
+# 	i=i+1
+# 	datafile.close()
 
 # fig17, ax17 = plt.subplots()
 # ax17.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
@@ -682,29 +682,29 @@ for model in models:
 # plt.grid()
 
 # Relative difference using constant phi (actually same as fig14_1, where the alpha is set constant, so in a way plotting this is unnecessary)
-rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
-rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
-rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
-rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
-rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
-rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
+# rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# rel_num_EdS = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 1, 0, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+# rel_num_OCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0.7, 0, 'LCDM', h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+# rel_num_w8 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+# rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+# rel_num_w11 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+# rel_num_w12 = delta_galaxy_number_rel_z_vec(z, z_ref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
 
-# Return the redshift at which maximum separation occurs
-sep = rel_num_LCDM - rel_num_w9
-max_sep = np.amax(np.abs(sep))
-z_max_sep_index = np.where(sep == max_sep)
-print("(Const alpha & phi) Max difference between LCDM and w=-0.9 at z = " + str(z[z_max_sep_index]))
+# # Return the redshift at which maximum separation occurs
+# sep = rel_num_LCDM - rel_num_w9
+# max_sep = np.amax(np.abs(sep))
+# z_max_sep_index = np.where(sep == max_sep)
+# print("(Const alpha & phi) Max difference between LCDM and w=-0.9 at z = " + str(z[z_max_sep_index]))
 
-# Write data to file, 1st row: z, 2nd row: rel_num_<model>
-models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
-i=0
-for model in models:
-	datafile=open(os.path.join(cur_path, "RelDif//RelDif_constPhiAlpha_zref") + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
-	data = np.stack((z, model), axis=1)
-	np.savetxt(datafile, data)
-	i=i+1
-	datafile.close()
+# # Write data to file, 1st row: z, 2nd row: rel_num_<model>
+# models = np.array([rel_num_LCDM, rel_num_EdS, rel_num_OCDM, rel_num_w8, rel_num_w9, rel_num_w11, rel_num_w12])
+# i=0
+# for model in models:
+# 	datafile=open(os.path.join(cur_path, "RelDif//RelDif_constPhiAlpha_zref") + str(z_ref) + "_m" + str(magnitude_min) + "_" + modelname[i] + ".txt", 'w')
+# 	data = np.stack((z, model), axis=1)
+# 	np.savetxt(datafile, data)
+# 	i=i+1
+# 	datafile.close()
 
 # fig18, ax18 = plt.subplots()
 # ax18.set_ylabel(r"Relative difference of $\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref))
@@ -722,60 +722,60 @@ for model in models:
 # plt.grid()
 
 # ----------------------Create plot of maximum separation as a function of reference redshift---------------------------------------------------
-max_sepArray = np.array([])
-z_max_sepArray = np.array([])
-zrefArray = np.array([3, 3.5, 4, 4.5, 5, 5.5, 6])
+# max_sepArray = np.array([])
+# z_max_sepArray = np.array([])
+# zrefArray = np.array([3, 3.5, 4, 4.5, 5, 5.5, 6])
 
-for zref in zrefArray:
-	rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, zref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-	rel_num_w9 = delta_galaxy_number_rel_z_vec(z, zref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
-	sep = rel_num_LCDM - rel_num_w9
-	max_sep = np.amax(np.abs(sep))
-	z_max_sep_index = np.where(sep == max_sep)
-	z_max_sep = z[z_max_sep_index]
-	max_sepArray = np.append(max_sepArray, max_sep)
-	z_max_sepArray = np.append(z_max_sepArray, z_max_sep)
+# for zref in zrefArray:
+# 	rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, zref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# 	rel_num_w9 = delta_galaxy_number_rel_z_vec(z, zref, magnitude_min, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+# 	sep = rel_num_LCDM - rel_num_w9
+# 	max_sep = np.amax(np.abs(sep))
+# 	z_max_sep_index = np.where(sep == max_sep)
+# 	z_max_sep = z[z_max_sep_index]
+# 	max_sepArray = np.append(max_sepArray, max_sep)
+# 	z_max_sepArray = np.append(z_max_sepArray, z_max_sep)
 
-fig17_1, ax17_1 = plt.subplots()
-ax17_1.plot(zrefArray, max_sepArray, 'o-')
-ax17_1.set_xlabel(r"reference redshift $z_{ref}$")
-ax17_1.set_ylabel(r"maximum relative number difference")
-ax17_1.set_title("min. app. magnitude = " + str(magnitude_min))
-# ax17_1.set_yscale('log')
+# fig17_1, ax17_1 = plt.subplots()
+# ax17_1.plot(zrefArray, max_sepArray, 'o-')
+# ax17_1.set_xlabel(r"reference redshift $z_{ref}$")
+# ax17_1.set_ylabel(r"maximum relative number difference")
+# ax17_1.set_title("min. app. magnitude = " + str(magnitude_min))
+# # ax17_1.set_yscale('log')
 
-fig17_2, ax17_2 = plt.subplots()
-ax17_2.plot(zrefArray, z_max_sepArray, 'o-')
-ax17_2.set_xlabel(r"reference redshift $z_{ref}$")
-ax17_2.set_ylabel(r"redshift $z$ with maximum difference")
-ax17_2.set_title("min. app. magnitude = " + str(magnitude_min))
+# fig17_2, ax17_2 = plt.subplots()
+# ax17_2.plot(zrefArray, z_max_sepArray, 'o-')
+# ax17_2.set_xlabel(r"reference redshift $z_{ref}$")
+# ax17_2.set_ylabel(r"redshift $z$ with maximum difference")
+# ax17_2.set_title("min. app. magnitude = " + str(magnitude_min))
 
-# -----------------Create plot of maximum separation as a function of magnitude-------------------------------------
-max_sepArray = np.array([])
-z_max_sepArray = np.array([])
-magminArray = np.array([25, 27, 28, 30, 32])
+# # -----------------Create plot of maximum separation as a function of magnitude-------------------------------------
+# max_sepArray = np.array([])
+# z_max_sepArray = np.array([])
+# magminArray = np.array([25, 27, 28, 30, 32])
 
-for magmin in magminArray:
-	rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magmin, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-	rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magmin, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
-	sep = rel_num_LCDM - rel_num_w9
-	max_sep = np.amax(np.abs(sep))
-	z_max_sep_index = np.where(sep == max_sep)
-	z_max_sep = z[z_max_sep_index]
-	max_sepArray = np.append(max_sepArray, max_sep)
-	z_max_sepArray = np.append(z_max_sepArray, z_max_sep)
+# for magmin in magminArray:
+# 	rel_num_LCDM = delta_galaxy_number_rel_z_vec(z, z_ref, magmin, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# 	rel_num_w9 = delta_galaxy_number_rel_z_vec(z, z_ref, magmin, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(0, -0.093, -1.3), -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+# 	sep = rel_num_LCDM - rel_num_w9
+# 	max_sep = np.amax(np.abs(sep))
+# 	z_max_sep_index = np.where(sep == max_sep)
+# 	z_max_sep = z[z_max_sep_index]
+# 	max_sepArray = np.append(max_sepArray, max_sep)
+# 	z_max_sepArray = np.append(z_max_sepArray, z_max_sep)
 
-fig13_1, ax13_1 = plt.subplots()
-ax13_1.plot(magminArray, max_sepArray, 'o-')
-ax13_1.set_xlabel(r"apparent magnitude threshold")
-ax13_1.set_ylabel(r"maximum relative number difference")
-ax13_1.set_title(r"$z_{ref} = $" + str(z_ref))
-ax13_1.set_yscale('log')
+# fig13_1, ax13_1 = plt.subplots()
+# ax13_1.plot(magminArray, max_sepArray, 'o-')
+# ax13_1.set_xlabel(r"apparent magnitude threshold")
+# ax13_1.set_ylabel(r"maximum relative number difference")
+# ax13_1.set_title(r"$z_{ref} = $" + str(z_ref))
+# ax13_1.set_yscale('log')
 
-fig13_2, ax13_2 = plt.subplots()
-ax13_2.plot(magminArray, z_max_sepArray, 'o-')
-ax13_2.set_xlabel(r"apparent magnitude threshold")
-ax13_2.set_ylabel(r"redshift $z$ with maximum difference")
-ax13_2.set_title(r"$z_{ref} = $" + str(z_ref))
+# fig13_2, ax13_2 = plt.subplots()
+# ax13_2.plot(magminArray, z_max_sepArray, 'o-')
+# ax13_2.set_xlabel(r"apparent magnitude threshold")
+# ax13_2.set_ylabel(r"redshift $z$ with maximum difference")
+# ax13_2.set_title(r"$z_{ref} = $" + str(z_ref))
 #---------------------------------------------------------------------------------------------------------------------
 
 
