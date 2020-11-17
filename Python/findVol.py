@@ -182,7 +182,12 @@ def delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alp
 	# print(model)
 	# print("number: " + str(number))
 	# print("number_z: " + str(number_z_ref))
-	return (number - number_z_ref) / number_z_ref
+	# Error analysis
+	d_number = np.sqrt(number)
+	d_number_z_ref = np.sqrt(number_z_ref)
+	rel = (number - number_z_ref) / number_z_ref
+	d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2)
+	return np.array([rel, d_rel])
 
 def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b

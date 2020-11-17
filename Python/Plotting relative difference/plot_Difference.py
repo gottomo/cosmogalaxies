@@ -29,7 +29,7 @@ Phi_directVec = np.vectorize(findVol.Phi_direct)
 alpha = findVol.alpha
 
 # Constants and Settings
-h_today = 0.7
+h_today = 0.74
 magnitude_min = 32
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 6
