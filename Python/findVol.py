@@ -7,6 +7,8 @@ import os
 # Hubble constant is h = 0.7 by default
 # By default the functions are written so that it returns cosmological constant (LCDM) dark energy model
 
+one_sqr_degree = (np.pi/180)**2 
+
 # Functinos
 	
 def omega_de(z, omega_0, model, **kwargs ):
@@ -175,7 +177,7 @@ def delta_galaxy_number_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2,
 	return number - number_z_ref
 
 
-def delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+def experimental_delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	# Returns the difference in number density of galaxies between an arbitrary z and a set z
 	number_z_ref = galaxy_number(z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h)
 	number = galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h)
@@ -186,8 +188,41 @@ def delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alp
 	d_number = np.sqrt(number)
 	d_number_z_ref = np.sqrt(number_z_ref)
 	rel = (number - number_z_ref) / number_z_ref
-	d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2)
-	return np.array([rel, d_rel])
+	if(number!=number_z_ref):
+		d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2)
+	else:
+		d_rel=0
+	# print(np.array([rel, d_rel]))
+	return np.array([[rel, d_rel]])
+
+def delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+	# Returns the difference in number density of galaxies between an arbitrary z and a set z
+	number_z_ref = galaxy_number(z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h)
+	number = galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h)
+	# print(model)
+	# print("number: " + str(number))
+	# print("number_z: " + str(number_z_ref))
+	rel = (number - number_z_ref) / number_z_ref
+	return rel
+
+def d_delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, sqd=1, w_0=-1, w_1=0, h=0.7):
+	# Returns the uncertianty of difference in number density of galaxies between an arbitrary z and a set z
+	# Not the most ideal way to do things, by calling this function alongside the delta_galaxy_number_rel_z(), we're doing twice the work
+	number_z_ref = galaxy_number(z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+	number = galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+	# print(model)
+	# print("number: " + str(number))
+	# print("number_z: " + str(number_z_ref))
+	# Error analysis
+	d_number = np.sqrt(number)
+	d_number_z_ref = np.sqrt(number_z_ref)
+	rel = (number - number_z_ref) / number_z_ref
+	if(number!=number_z_ref):
+		d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
+	else:
+		d_rel=0
+	return d_rel
+
 
 def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b
@@ -272,7 +307,6 @@ Phi_directVec = np.vectorize(Phi_direct)
 # ------------------------------------------Set the constants-------------------------------------------
 h_today = 0.7
 magnitude_min = 32
-one_sqr_degree = (np.pi/180)**2 
 z_ref = 6
 z = np.linspace(0.01,z_ref,50*z_ref/3)
 
