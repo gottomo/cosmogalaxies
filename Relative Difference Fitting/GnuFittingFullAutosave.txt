@@ -1,0 +1,217 @@
+set xlabel "redshift z"
+set ylabel "relative number of galaxies"
+set title "Fit on the difference relative to z = 3 at magnitude 27 \n using f(x) = a (1+z)^m e^(b (1+z))"
+set fit errorvariables
+
+# set fit_limit # default set to 10^(-5) difference between iterations
+
+PhiAlpha = "varPhi"
+reference = "zref3"
+magnitude = "m32"
+
+
+EdS = "RelDif_".PhiAlpha."_".reference."_".magnitude."_EdS.txt"
+LCDM = "RelDif_".PhiAlpha."_".reference."_".magnitude."_LCDM.txt"
+OCDM = "RelDif_".PhiAlpha."_".reference."_".magnitude."_OCDM.txt"
+w09 = "RelDif_".PhiAlpha."_".reference."_".magnitude."_w9.txt"
+w11 = "RelDif_".PhiAlpha."_".reference."_".magnitude."_w11.txt"
+
+#Types = EdS LCDM OCDM w09 w11
+
+#files = "RelDif_constPhiAlpha_zref3_m27_EdS RelDif_constPhiAlpha_zref3_m27_LCDM RelDif_constPhiAlpha_zref3_m27_OCDM RelDif_constPhiAlpha_zref3_m27_w9 RelDif_constPhiAlpha_zref3_m27_w11"
+
+
+#plot filename us 1:2 title 'data'
+f(x)=a*(1+x)**m*exp(b*(1+x))
+g(x)=c*(1+x)**n*exp(d*(1+x))
+h(x)=e*(1+x)**o*exp(f*(1+x))
+i(x)=g*(1+x)**p*exp(h*(1+x))
+j(x)=i*(1+x)**q*exp(j*(1+x))
+
+set term wxt title "Full range"
+
+# Fit for all range
+fit f(x) EdS us 1:2 via a, m, b
+fit g(x) LCDM us 1:2 via c, n, d
+fit h(x) OCDM us 1:2 via e, o, f
+fit i(x) w09 us 1:2 via g, p, h
+fit j(x) w11 us 1:2 via i, q, j
+plot f(x) title "Einstein de Sitter" lw 3, g(x) title "LCDM" lw 3, h(x) title "OCDM" lw 3, i(x) title "w = -0.9" lw 3, j(x) title "w = -1.1" lw 3, EdS, LCDM, OCDM, w09, w11 us 1:2 title "data"
+
+set terminal png size 1024,768
+set output "FitFull_".PhiAlpha."_".reference."_".magnitude.".png"
+replot
+
+set term wxt title "0.5 up"
+set output
+
+set print "FitFull_".PhiAlpha."_".reference."_".magnitude.".txt"
+print "# EdS"
+print a, a_err
+print m, m_err
+print b, b_err
+print "# LCDM"
+print c, c_err
+print n, n_err
+print d, d_err
+print "# OCDM"
+print e, e_err
+print o, o_err
+print f, f_err
+print "# w09"
+print g, g_err
+print p, p_err
+print h, h_err
+print "# w11"
+print i, i_err
+print q, q_err
+print j, j_err
+set print
+
+# Fit for 0.5<z
+fit[0.5:] f(x) EdS us 1:2 via a, m, b
+fit[0.5:] g(x) LCDM us 1:2 via c, n, d
+fit[0.5:] h(x) OCDM us 1:2 via e, o, f
+fit[0.5:] i(x) w09 us 1:2 via g, p, h
+fit[0.5:] j(x) w11 us 1:2 via i, q, j
+plot[0.5:] f(x) title "Einstein de Sitter" lw 3, g(x) title "LCDM" lw 3, h(x) title "OCDM" lw 3, i(x) title "w = -0.9" lw 3, j(x) title "w = -1.1" lw 3, EdS, LCDM, OCDM, w09, w11 us 1:2 title "data"
+
+
+set terminal png  size 1024,768
+set output "Fit0.5_".PhiAlpha."_".reference."_".magnitude.".png"
+replot
+set term wxt title "0.5 to 2.5"
+set output
+
+set print "Fit0.5_".PhiAlpha."_".reference."_".magnitude.".txt"
+print "# EdS"
+print a, a_err
+print m, m_err
+print b, b_err
+print "# LCDM"
+print c, c_err
+print n, n_err
+print d, d_err
+print "# OCDM"
+print e, e_err
+print o, o_err
+print f, f_err
+print "# w09"
+print g, g_err
+print p, p_err
+print h, h_err
+print "# w11"
+print i, i_err
+print q, q_err
+print j, j_err
+set print
+
+#fit[0.5:2.5] f(x) EdS us 1:2 via a, m, b
+fit[0.5:2.5] g(x) LCDM us 1:2 via c, n, d
+fit[0.5:2.5] h(x) OCDM us 1:2 via e, o, f
+fit[0.5:2.5] i(x) w09 us 1:2 via g, p, h
+fit[0.5:2.5] j(x) w11 us 1:2 via i, q, j
+plot[0.5:2.5] f(x) title "Einstein de Sitter" lw 3, g(x) title "LCDM" lw 3, h(x) title "OCDM" lw 3, i(x) title "w = -0.9" lw 3, j(x) title "w = -1.1" lw 3, EdS, LCDM, OCDM, w09, w11 us 1:2 title "data"
+
+set terminal png  size 1024,768
+set output "Fit0.5-2.5_".PhiAlpha."_".reference."_".magnitude.".png"
+replot
+set term wxt title "0.8 up"
+set output
+
+set print "Fit0.5-2.5_".PhiAlpha."_".reference."_".magnitude.".txt"
+print "# EdS"
+print a, a_err
+print m, m_err
+print b, b_err
+print "# LCDM"
+print c, c_err
+print n, n_err
+print d, d_err
+print "# OCDM"
+print e, e_err
+print o, o_err
+print f, f_err
+print "# w09"
+print g, g_err
+print p, p_err
+print h, h_err
+print "# w11"
+print i, i_err
+print q, q_err
+print j, j_err
+set print
+
+# Fit for 0.8<z
+fit[0.8:] f(x) EdS us 1:2 via a, m, b
+fit[0.8:] g(x) LCDM us 1:2 via c, n, d
+fit[0.8:] h(x) OCDM us 1:2 via e, o, f
+fit[0.8:] i(x) w09 us 1:2 via g, p, h
+fit[0.8:] j(x) w11 us 1:2 via i, q, j
+plot[0.8:] f(x) title "Einstein de Sitter" lw 3, g(x) title "LCDM" lw 3, h(x) title "OCDM" lw 3, i(x) title "w = -0.9" lw 3, j(x) title "w = -1.1" lw 3, EdS, LCDM, OCDM, w09, w11 us 1:2 title "data"
+
+set terminal png size 1024,768
+set output "Fit0.8_".PhiAlpha."_".reference."_".magnitude.".png"
+replot
+set term wxt title "0.8 to 2.5"
+set output
+
+set print "Fit0.8_".PhiAlpha."_".reference."_".magnitude.".txt"
+print "# EdS"
+print a, a_err
+print m, m_err
+print b, b_err
+print "# LCDM"
+print c, c_err
+print n, n_err
+print d, d_err
+print "# OCDM"
+print e, e_err
+print o, o_err
+print f, f_err
+print "# w09"
+print g, g_err
+print p, p_err
+print h, h_err
+print "# w11"
+print i, i_err
+print q, q_err
+print j, j_err
+set print
+
+# Fit for 0.8<z<2.5
+fit[0.8:2.5] f(x) EdS us 1:2 via a, m, b
+fit[0.8:2.5] g(x) LCDM us 1:2 via c, n, d
+fit[0.8:2.5] h(x) OCDM us 1:2 via e, o, f
+fit[0.8:2.5] i(x) w09 us 1:2 via g, p, h
+fit[0.8:2.5] j(x) w11 us 1:2 via i, q, j
+plot[0.8:2.5] f(x)  title "Einstein de Sitter" lw 3, g(x) title "LCDM" lw 3, h(x) title "OCDM" lw 3, i(x) title "w = -0.9" lw 3, j(x) title "w = -1.1" lw 3, EdS, LCDM, OCDM, w09, w11 us 1:2 title "data"
+
+set terminal png size 1024,768
+set output "Fit0.8-2.5_".PhiAlpha."_".reference."_".magnitude.".png"
+replot
+set term wxt
+set output
+
+set print "Fit0.8-2.5_".PhiAlpha."_".reference."_".magnitude.".txt"
+print "# EdS"
+print a, a_err
+print m, m_err
+print b, b_err
+print "# LCDM"
+print c, c_err
+print n, n_err
+print d, d_err
+print "# OCDM"
+print e, e_err
+print o, o_err
+print f, f_err
+print "# w09"
+print g, g_err
+print p, p_err
+print h, h_err
+print "# w11"
+print i, i_err
+print q, q_err
+print j, j_err
+set print
