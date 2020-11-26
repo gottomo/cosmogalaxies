@@ -1,0 +1,32 @@
+set xlabel "redshift z"
+set ylabel "relative number of galaxies"
+set title "Fit on the difference relative to z = 3 at magnitude 25 \n using f(x) = a (1+z)^m e^(b (1+z))"
+set fit errorvariables
+
+set print "ParamsVarH.txt"
+
+#f(x)=a*(1+x)**m*exp(b*(1+x))
+#FitToH{N}.txt
+
+fstr(N) = sprintf('f%d(x) = a%d *(1+x) ** b%d * exp(c%d * (1+x))', N, N, N, N)
+
+astr(N) = sprintf('a%d = 10', N)
+bstr(N) = sprintf('b%d = 1', N)
+cstr(N) = sprintf('c%d = -1', N)
+
+fitstr(N) = sprintf('fit[0.5:2.5] f%d(x) ''FitToH%d.txt'' using 1:2 via a%d,b%d,c%d', N, N, N, N, N)
+
+savestr(N) = sprintf('print a%d, a%d_err, b%d, b%d_err, c%d, c%d_err', N, N, N, N, N, N)
+
+plotstr(N) = sprintf('plot[0.5:2.5] f%d(x), ''FitToH%d.txt'' us 1:2', N, N)
+
+
+do for [i=0:69] {
+    eval(fstr(i))
+    eval(astr(i))
+    eval(bstr(i))
+    eval(cstr(i))
+    eval(fitstr(i))
+    eval(savestr(i))
+    eval(plotstr(i))
+}
