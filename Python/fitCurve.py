@@ -5,6 +5,16 @@ import scipy.optimize as optimize
 def linfnc(x, a, b):
     return a*x + b
 
+def chisq_linfnc(par1, par2, xdata, ydata, yerr):
+    linfnc = par1 * xdata + par2
+    chisq = np.sum(((ydata - linfnc)/yerr)**2)
+    return chisq
+
+def chisq_gammafnc(par1, par2, par3, xdata, ydata, yerr):
+    gammafnc = par1 * (1 + xdata)**par2 * np.exp(par3*(1 + xdata))
+    chisq = np.sum(((ydata - gammafnc)/yerr)**2)
+    return chisq
+
 # Define data
 z = np.array([0.45, 0.75, 1.25, 1.75, 2.25, 2.75])
 alpha = np.array([-1.41, -1.34, -1.31, -1.51, -1.56, -1.69])
