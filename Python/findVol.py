@@ -308,7 +308,7 @@ Phi_directVec = np.vectorize(Phi_direct)
 h_today = 0.7
 magnitude_min = 32
 z_ref = 6
-z = np.linspace(0.01,z_ref,50*z_ref/3)
+z = np.linspace(0.01,z_ref,round(50*z_ref/3))
 
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
 
