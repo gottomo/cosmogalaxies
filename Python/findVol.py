@@ -29,10 +29,8 @@ def omega_de(z, omega_0, model, **kwargs ):
 		# else:
 			# return omega_0 * np.exp(3 * integrate.quad(integrand_linear, 0, val, args = (w_0, w_1) )[0] )
 
-def e(z, omega_m, omega_k, omega_0, model, **kwargs):
+def e(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0):
 	# Returns the parameter E(z) required for other calculations
-	w_0 = kwargs.get('w_0')
-	w_1 = kwargs.get('w_1')
 	e = np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
 	return e
 	
@@ -229,11 +227,11 @@ def alpha(z, a, b):
 	return a * z + b
 	
 #---------------- functions for galaxy mergers--------------------------------------
-def LBTime(z, omega_m, omega_k, omega_0, model, h=0.7):
+def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
     t_H = 9.78 / h
     
     
-    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model)), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model, w_0, w_1)), 0, z) # integration holds error
     return integral[0] * t_H #* (1/100*h) # Want this in GIGAYEAR
 
 def Pair_Fraction(z, mass):
@@ -278,7 +276,7 @@ def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w
     
     # integrate the Snyder approximation to find how much phi should change.
     
-    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h))), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1))), 0, z) # integration holds error
     
     
     return np.exp(integral[0]) * OriginalPhi
@@ -292,6 +290,7 @@ delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
 magnitude_bol_vec = np.vectorize(magnitude_bol)
 schechter_mass_vec = np.vectorize(schechter_mass)
 mag_to_mass_vec = np.vectorize(mag_to_mass)
+galaxy_no_density_vec = np.vectorize(galaxy_no_density)
 galaxy_number_vec = np.vectorize(galaxy_number)
 delta_galaxy_number_vec = np.vectorize(delta_galaxy_number)
 lum_d_vec = np.vectorize(lum_d)
