@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate # this module does the integration
 import os
+import random
 
 # This code finds the comoving volume element per solid angle per redshift for different cosmological models
 # Hubble constant is h = 0.7 by default
@@ -29,8 +30,10 @@ def omega_de(z, omega_0, model, **kwargs ):
 		# else:
 			# return omega_0 * np.exp(3 * integrate.quad(integrand_linear, 0, val, args = (w_0, w_1) )[0] )
 
-def e(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0):
+def e(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the parameter E(z) required for other calculations
+	w_0 = kwargs.get('w_0')
+	w_1 = kwargs.get('w_1')
 	e = np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
 	return e
 	
@@ -221,43 +224,23 @@ def d_delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, a
 		d_rel=0
 	return d_rel
 
-def delta_galaxy_number_rel_z_comb(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7, sqd=1):
-	# Returns the difference in number density of galaxies between an arbitrary z and a set z
-	number_z_ref = galaxy_number(z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
-	number = galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
-	# print(model)
-	# print("number: " + str(number))
-	# print("number_z: " + str(number_z_ref))
-	rel = (number - number_z_ref) / number_z_ref
-	d_number = np.sqrt(number)
-	d_number_z_ref = np.sqrt(number_z_ref)
-	rel = (number - number_z_ref) / number_z_ref
-	if(number!=number_z_ref):
-		d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
-	else:
-		d_rel=0
-	return rel, d_rel
 
 def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b
 	return a * z + b
-
-def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
-    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
-    diff = Fraction **2
-    return diff
 	
-def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
-    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
-    diff = Fraction **2
-    return diff
-
 #---------------- functions for galaxy mergers--------------------------------------
-def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+def LBTime(z, omega_m, omega_k, omega_0, model, h=0.7):
     t_H = 9.78 / h
     
     
-    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model, w_0, w_1)), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model)), 0, z) # integration holds error
+    return integral[0] * t_H #* (1/100*h) # Want this in GIGAYEAR
+
+def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+    t_H = 9.78 / h
+    
+    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)), 0, z) # integration holds error
     return integral[0] * t_H #* (1/100*h) # Want this in GIGAYEAR
 
 def Pair_Fraction(z, mass):
@@ -302,7 +285,7 @@ def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w
     
     # integrate the Snyder approximation to find how much phi should change.
     
-    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1))), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h))), 0, z) # integration holds error
     
     
     return np.exp(integral[0]) * OriginalPhi
@@ -316,7 +299,6 @@ delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
 magnitude_bol_vec = np.vectorize(magnitude_bol)
 schechter_mass_vec = np.vectorize(schechter_mass)
 mag_to_mass_vec = np.vectorize(mag_to_mass)
-galaxy_no_density_vec = np.vectorize(galaxy_no_density)
 galaxy_number_vec = np.vectorize(galaxy_number)
 delta_galaxy_number_vec = np.vectorize(delta_galaxy_number)
 lum_d_vec = np.vectorize(lum_d)
@@ -893,3 +875,219 @@ mass_dex_array = np.linspace(7,12,200)
 # plt.grid()
 
 plt.show()
+
+
+# Import spl so we can interpolate the inverse Cumulative Distribution Function.
+from scipy.interpolate import splev, splrep
+
+
+
+# Schechter functions are exaclty as above, I just moved a copy here for reference.
+# =============================================================================
+# def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
+# 	# Returns Schechter function as a function of mass
+# 	# mass shall be given in the unit of dex (i.e. mass = log10(mass_in_solar_mass) )
+# 	# Will be in unit of dex^-1 Mpc^-3
+# 	mass_diff = mass - break_mass
+# 	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
+# 
+# 
+# def schechter_mass_linear(mass, break_mass, phi1, phi2, alpha1, alpha2):
+# 	# Returns Schechter function as a function of mass
+# 	# mass shall be given in the unit of dex (i.e. mass = log10(mass_in_solar_mass) )
+# 	# Will be in unit of dex^-1 Mpc^-3
+#     Density = np.exp(-mass/(break_mass)) * (phi1 * (mass/(break_mass))**alpha1 + phi2 * (mass/(break_mass))**alpha2 ) * (1/(break_mass))
+#     #Density = np.exp(-mass/(break_mass)) * (phi1 * (mass/(break_mass))**alpha1 + phi2 * (mass/(break_mass))**alpha2 ) * (mass/(break_mass))
+#     return Density
+# 
+# =============================================================================
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+    t_H = 9.78 / h
+    
+    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)), 0, z) # integration holds error
+    return integral[0] * t_H #* (1/100*h) # Want this in GIGAYEAR
+
+
+# Probability distribution function; We re-normalize Schechter so it integrates to 
+# one for our desired mass range. SchechterPDF re-calculates the norm every time we use
+# it, which doesn't take too long, but isn't ideal, so here we also just calculate
+# the norm for future reference
+def SchechterPDF_norm(Start, End, mass, break_mass, phi1, phi2, alpha1, alpha2):
+    Norm = integrate.quad(lambda Mass: schechter_mass_vec(Mass, break_mass, phi1, phi2, alpha1, alpha2), Start, End)[0]
+    #print(Norm)
+    return Norm
+
+
+def SchechterPDF(Start, End, mass, break_mass, phi1, phi2, alpha1, alpha2):
+    Norm = integrate.quad(lambda Mass: schechter_mass_vec(Mass, break_mass, phi1, phi2, alpha1, alpha2), Start, End)[0]
+    #print(Norm)
+    return (1/Norm)*schechter_mass_vec(mass, break_mass, phi1, phi2, alpha1, alpha2)
+
+
+# To get from the probability distribution function to the cumulative distribution function,
+# we simply integrate the probability of any mass up to and inluding our given mass; we get
+# the probability that the function has taken a value up to that point.
+def SchechterCDF(Start, End, mass, break_mass, phi1, phi2, alpha1, alpha2):
+    Norm = integrate.quad(lambda Mass: schechter_mass_vec(Mass, break_mass, phi1, phi2, alpha1, alpha2), Start, End)[0]
+    return (1/Norm)*integrate.quad(lambda Mass: schechter_mass_vec(Mass, break_mass, phi1, phi2, alpha1, alpha2), Start, mass)[0]
+
+# Another version that should be slightly quicker
+def SchechterCDF_Norm(Start, End, Norm, mass, break_mass, phi1, phi2, alpha1, alpha2):
+    return (1/Norm)*integrate.quad(lambda Mass: schechter_mass_vec(Mass, break_mass, phi1, phi2, alpha1, alpha2), Start, mass)[0]
+
+
+# To sample from the Schechter function, we invert the CDF, and then find the masses
+# corresponding to different probabilities in the range 0-1.
+# To invert the CDF, we can set SchechterCDF equal to our probability, and ask python
+# to solve for m.
+# What we do instead is calculate prbability as a function of mass, and then ask python
+# to interpolate the data that we then swap around.
+def SchechterInvCDF(Start, End, break_mass, phi1, phi2, alpha1, alpha2):
+    MassArray = np.linspace(Start,End, num=100)
+    Prob = SchechterCDF_vec(Start,End, MassArray, break_mass, phi1, phi2, alpha1, alpha2)
+    
+    spl = splrep(Prob, MassArray)
+    return spl # spl matrix holds the interpolation 
+
+# We use the interpolated funtion to create the desired number of 
+def SchechterSampling(Start, End, SampleNo, break_mass, phi1, phi2, alpha1, alpha2):
+    SPL = SchechterInvCDF(Start, End, break_mass, phi1, phi2, alpha1, alpha2)
+    
+    #list comprehension is faster, more pythonic.
+    Samples = np.array([splev(random.random(), SPL) for i in range(SampleNo)], dtype="float32")
+    # We re-cast the datatype because we don't need to know a very detailed mass for each
+    # galaxy, and we really need to be able to have many many galaxies.
+    
+    return Samples
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SchechterInvCDF_vec = np.vectorize(SchechterInvCDF)
+SchechterSampling_vec = np.vectorize(SchechterSampling)
+SchechterPDF_vec = np.vectorize(SchechterPDF)
+SchechterCDF_vec = np.vectorize(SchechterCDF)
+
+# Mass range we want to consider (in log):
+MinMass = 8
+MaxMass = 12
+
+# How many galaxies do we wnt to simpulate?
+GalaxyNumber = 10**7
+
+# A set of masses over wheich we can plot our schechter/ PCF/ CDF functions
+MassArray = np.linspace(MinMass,MaxMass, num=200)
+
+# A set of probabilities between 0 &1 so we can plot our inverse CDF
+probArray = np.linspace(0,1, num=100)
+
+
+
+# Let's plot some stuff as proof of concept
+#PDF
+PDF = SchechterPDF_vec(MinMass,MaxMass, MassArray, 11.32, 10**(-3.2), 0, -1.41, 0)
+plt.plot(MassArray, PDF)
+plt.title("Probability distribution function")
+plt.show()
+
+#CDF
+CDF = SchechterCDF_vec(MinMass,MaxMass, MassArray, 11.32, 10**(-3.2), 0, -1.41, 0)
+plt.plot(MassArray, CDF)
+plt.title("Cumulative distribution function")
+plt.show()
+
+# Now let's interpolate the inverse of this
+spl = SchechterInvCDF_vec(8, 12, 11.32, 10**(-3.2), 0, -1.41, 0)
+InverseCDF = splev(probArray, spl)
+
+# This looks like
+plt.plot(probArray, InverseCDF)
+plt.title("Inverse CDF")
+#plt.yscale("log")
+plt.show()
+
+
+# Now let's check this interpolation matches up with the CDF
+plt.plot(InverseCDF, probArray, label = "Interpolated")
+plt.plot(MassArray, CDF, label = "analytic")
+plt.title("Comparison of the interpolated CDF values to the CDF function")
+#plt.yscale("log")
+plt.legend()
+plt.show()
+
+
+# Now let's sample some galaxies to see if they are correctly distributed
+
+Galaxies = SchechterSampling(8,12, GalaxyNumber, 11.32, 10**(-3.2), 0, -1.41, 0)
+
+plt.hist(Galaxies, bins = 100, alpha = 0.7)
+plt.title("Number of galaxies per log bin sampled from Schechter")
+plt.ylabel("Number of galaxies")
+plt.xlabel("Mass")
+plt.yscale("log")
+plt.plot()
+plt.show()
+
+# Set of bar heights to fit to
+FitToSchechter = np.histogram(Galaxies, bins = 100, range = (8,12))
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Now for the actual simulation on the galaxies we've created from the Schechter PCF
+
+def StarForm(mass, time): # What is our star formation rate function?
+    return 5*10**8 #in SOLAR MASS PER GYR!!!!!
+
+def SchechterEvolve(galaxies, StartZ, EndZ, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+    zArray = np.linspace(StartZ, EndZ, num=100)
+    Times = LBTimeVec(zArray, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)
+    
+    dt = [Times[n+1]-Times[n] for n in range(len(Times)-1)]
+    
+    #print(dt)
+    
+    #Evolution = [[np.log10(10**gal + StarForm(gal,t)*dt) for i, gal in enumerate(galaxies)]for n, t in enumerate(dt)]
+    Evolution = np.zeros((len(dt), len(galaxies)), dtype = "float32")
+    Evolution[0] = galaxies
+    
+    for n in range(len(dt)-1):
+        GalLine = np.array([np.log10(10**Evolution[n, i] - StarForm(Evolution[n, i],Times[n])*dt[n]) for i in range(len(galaxies))], dtype = "float32")
+        Evolution[n+1] = GalLine
+        #print(GalLine)
+    return Evolution
+
+Gals1 = SchechterEvolve(Galaxies, 0, 3, 0.3, 0, 0.7, "LCDM")
+
+zArray = np.linspace(0, 3, num=100)
+
+for i in range(0,100,10):
+    plt.hist(Gals1[i], bins = 100, alpha = 0.4, label = "z = %2.3f"%(zArray[i]))
+    plt.title("Monte Carlo simulation of galaxies with %i galaxies"%(GalaxyNumber))
+    plt.xlabel("Mass (dex)")
+    plt.ylabel("Number of galaxies")
+    plt.yscale("log")
+    #plt.plot()
+
+plt.legend()
+plt.show()
+
+Gals2 = SchechterEvolve(Galaxies, 3, 0, 0.3, 0, 0.7, "LCDM")
+
+for i in range(0,100,10):
+    plt.hist(Gals2[i], bins = 100, alpha = 0.4, label = "z = %2.3f"%(zArray[-i]))
+    plt.title("Monte Carlo simulation of galaxies with %i galaxies"%(GalaxyNumber))
+    plt.xlabel("Mass (dex)")
+    plt.ylabel("Number of galaxies")
+    plt.yscale("log")
+    #plt.plot()
+
+plt.legend()
+plt.show()
+
+
+
+
+

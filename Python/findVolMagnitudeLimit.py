@@ -29,11 +29,14 @@ def omega_de(z, omega_0, model, **kwargs ):
 		# else:
 			# return omega_0 * np.exp(3 * integrate.quad(integrand_linear, 0, val, args = (w_0, w_1) )[0] )
 
-def e(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0):
+def e(z, omega_m, omega_k, omega_0, model, **kwargs):
 	# Returns the parameter E(z) required for other calculations
-	e = np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
-	return e
-	
+    w_0 = kwargs.get('w_0')
+    w_1 = kwargs.get('w_1')
+    e = np.sqrt(omega_m * (1 + z) ** 3 + omega_k * (1 + z) **2 + omega_de(z, omega_0, model, w_0 = w_0, w_1 = w_1))
+    return e
+
+
 def comoving_d_los(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	# Returns the line-of-sight comoving distance in Mpc
 	# Also works in the case if z is array
@@ -44,7 +47,7 @@ def comoving_d_los(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 def comoving_d(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	# Returns the transverse comoving distance in Mpc
 	# Works for all geometry of space.
-	com_d_los = comoving_d_los(z, omega_m, omega_k, omega_0, model, w_0, w_1, h) # reassigning the function to a variable so that the code is shorter
+	com_d_los = comoving_d_los(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h) # reassigning the function to a variable so that the code is shorter
 	if omega_k == 0:
 		return com_d_los
 	elif omega_k < 0:
@@ -61,7 +64,7 @@ def ang_diameter_d(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	
 def lum_d(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	# Returns the luminosity distance
-	lum_d = comoving_d(z, omega_m, omega_k, omega_0, model, w_0, w_1, h) * (1 + z)
+	lum_d = comoving_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h) * (1 + z)
 	return lum_d
 
 def comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
@@ -221,43 +224,24 @@ def d_delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, a
 		d_rel=0
 	return d_rel
 
-def delta_galaxy_number_rel_z_comb(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7, sqd=1):
-	# Returns the difference in number density of galaxies between an arbitrary z and a set z
-	number_z_ref = galaxy_number(z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
-	number = galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
-	# print(model)
-	# print("number: " + str(number))
-	# print("number_z: " + str(number_z_ref))
-	rel = (number - number_z_ref) / number_z_ref
-	d_number = np.sqrt(number)
-	d_number_z_ref = np.sqrt(number_z_ref)
-	rel = (number - number_z_ref) / number_z_ref
-	if(number!=number_z_ref):
-		d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
-	else:
-		d_rel=0
-	return rel, d_rel
 
 def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b
 	return a * z + b
 
-def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
-    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
-    diff = Fraction **2
-    return diff
-	
+
 def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
     Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
     diff = Fraction **2
     return diff
 
+	
 #---------------- functions for galaxy mergers--------------------------------------
-def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+def LBTime(z, omega_m, omega_k, omega_0, model, h=0.7):
     t_H = 9.78 / h
     
     
-    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model, w_0, w_1)), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: 1/((1+Z)*e(Z, omega_m, omega_k, omega_0, model)), 0, z) # integration holds error
     return integral[0] * t_H #* (1/100*h) # Want this in GIGAYEAR
 
 def Pair_Fraction(z, mass):
@@ -302,7 +286,7 @@ def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w
     
     # integrate the Snyder approximation to find how much phi should change.
     
-    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1))), 0, z) # integration holds error
+    integral = integrate.quad(lambda Z: ((t_H * M * (1+Z) ** (a+1)) / (2.4 * e(Z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h))), 0, z) # integration holds error
     
     
     return np.exp(integral[0]) * OriginalPhi
@@ -316,7 +300,6 @@ delta_com_vol_elm_vec = np.vectorize(delta_com_vol_elm)
 magnitude_bol_vec = np.vectorize(magnitude_bol)
 schechter_mass_vec = np.vectorize(schechter_mass)
 mag_to_mass_vec = np.vectorize(mag_to_mass)
-galaxy_no_density_vec = np.vectorize(galaxy_no_density)
 galaxy_number_vec = np.vectorize(galaxy_number)
 delta_galaxy_number_vec = np.vectorize(delta_galaxy_number)
 lum_d_vec = np.vectorize(lum_d)
@@ -327,6 +310,7 @@ appmag_to_absmag_vec = np.vectorize(appmag_to_absmag)
 alpha_vec = np.vectorize(alpha)
 LBTimeVec = np.vectorize(LBTime)
 Phi_directVec = np.vectorize(Phi_direct)
+mass_limit_rel_to_LCDMvec =np.vectorize(mass_limit_rel_to_LCDM)
 
 
 # ------------------------------------------Set the constants-------------------------------------------
@@ -893,3 +877,57 @@ mass_dex_array = np.linspace(7,12,200)
 # plt.grid()
 
 plt.show()
+
+# rel_num_EdS  1, 0, 0, 'LCDM', h=h_today)
+# rel_num_OCDM =  0.3, 0.7, 0, 'LCDM', h=h_today)
+# rel_num_w8 =  0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today)
+# rel_num_w9 =  0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today)
+# rel_num_w11 =  0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today)
+# rel_num_w12 =  0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today)
+
+
+
+zArray = np.linspace(0.001, 6)
+
+
+LCDM = mass_limit_rel_to_LCDMvec(zArray, 0.3, 0, 0.7, "LCDM")
+EdS = mass_limit_rel_to_LCDMvec(zArray, 1, 0, 0, "LCDM")
+OCDM = mass_limit_rel_to_LCDMvec(zArray, 0.3, 0.7, 0, "LCDM")
+LCDM08 = mass_limit_rel_to_LCDMvec(zArray, 0.3, 0, 0.7, "constant_w", w_0 = -0.8)
+LCDM09 = mass_limit_rel_to_LCDMvec(zArray, 0.3, 0, 0.7, "constant_w", w_0 = -0.9)
+LCDM11 = mass_limit_rel_to_LCDMvec(zArray, 0.3, 0, 0.7, "constant_w", w_0 = -1.1)
+LCDM12 = mass_limit_rel_to_LCDMvec(zArray, 0.3, 0, 0.7, "constant_w", w_0 = -1.2)
+
+
+plt.plot(zArray, LCDM, label = "LCDM", linewidth = 2)
+plt.plot(zArray, EdS, label = "Einstein de Sitter", linestyle = "--", linewidth = 2)
+plt.plot(zArray, OCDM, label = "OCDM", linestyle = "dashdot", linewidth = 2)
+
+plt.plot(zArray, LCDM08, label = "W0 = -0.8", linestyle = ":")
+plt.plot(zArray, LCDM09, label = "W0 = -0.9", linestyle = ":")
+plt.plot(zArray, LCDM11, label = "W0 = -1.1", linestyle = ":")
+plt.plot(zArray, LCDM12, label = "W0 = -1.2", linestyle = ":")
+
+plt.legend()
+plt.title("Difference in mass needed to achieve an apparent magnitude \n for different cosmologies")
+
+plt.xlabel("Redshift z")
+plt.ylabel("Relative difference in masses (m1/m2)")
+
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
