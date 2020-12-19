@@ -221,11 +221,32 @@ def d_delta_galaxy_number_rel_z(z, z_ref, mag, break_mass, phi1, phi2, alpha1, a
 		d_rel=0
 	return d_rel
 
+def delta_galaxy_number_rel_z_comb(z, z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7, sqd=1):
+	# Returns the difference in number density of galaxies between an arbitrary z and a set z
+	number_z_ref = galaxy_number(z_ref, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+	number = galaxy_number(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+	# print(model)
+	# print("number: " + str(number))
+	# print("number_z: " + str(number_z_ref))
+	rel = (number - number_z_ref) / number_z_ref
+	d_number = np.sqrt(number)
+	d_number_z_ref = np.sqrt(number_z_ref)
+	rel = (number - number_z_ref) / number_z_ref
+	if(number!=number_z_ref):
+		d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
+	else:
+		d_rel=0
+	return rel, d_rel
 
 def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b
 	return a * z + b
 	
+def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
+    diff = Fraction **2
+    return diff
+
 #---------------- functions for galaxy mergers--------------------------------------
 def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
     t_H = 9.78 / h
