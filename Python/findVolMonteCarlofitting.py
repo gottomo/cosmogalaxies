@@ -992,7 +992,7 @@ BinFinesse = 20 # bins per dex mass on the x axis
 NumberOfBins = (MaxMass-MinMass) * BinFinesse
 
 # How many galaxies do we wnt to simpulate?
-GalaxyNumber = 10**5
+GalaxyNumber = 10**7
 
 
 # A set of masses over wheich we can plot our schechter/ PCF/ CDF functions
@@ -1165,80 +1165,80 @@ plt.show()
 # Why does this suddenly not work????
 
 # =============================================================================
-# # Now for the actual simulation on the galaxies we've created from the Schechter PCF
-# 
-# def StarForm(mass, time): # What is our star formation rate function?
-#     return 5*10**8 #in SOLAR MASS PER GYR!!!!!
-# 
-# def SchechterEvolve(galaxies, StartZ, EndZ, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
-#     zArray = np.linspace(StartZ, EndZ, num=100)
-#     Times = LBTimeVec(zArray, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)
-#     
-#     dt = [Times[n+1]-Times[n] for n in range(len(Times)-1)]
-#     
-#     #print(dt)
-#     
-#     #Evolution = [[np.log10(10**gal + StarForm(gal,t)*dt) for i, gal in enumerate(galaxies)]for n, t in enumerate(dt)]
-#     Evolution = np.zeros((len(dt), len(galaxies)), dtype = "float32")
-#     Evolution[0] = galaxies
-#     
-#     for n in range(len(dt)-1):
-#         GalLine = np.array([np.log10(10**Evolution[n, i] - StarForm(Evolution[n, i],Times[n])*dt[n]) for i in range(len(galaxies))], dtype = "float32")
-#         Evolution[n+1] = GalLine
-#         #print(GalLine)
-#     return Evolution
-# 
-# Gals1 = SchechterEvolve(Galaxies, 0, 3, 0.3, 0, 0.7, "LCDM")
-# 
-# zArray = np.linspace(0, 3, num=100)
-# 
-# for i in range(0,100,10):
-#     plt.hist(Gals1[i], bins = 100, alpha = 0.4, label = "z = %2.3f"%(zArray[i]))
-#     plt.title("Monte Carlo simulation of galaxies with %i galaxies"%(GalaxyNumber))
-#     plt.xlabel("Mass (dex)")
-#     plt.ylabel("Number of galaxies")
-#     plt.yscale("log")
-#     #plt.plot()
-# 
-# plt.legend()
-# plt.show()
-# 
-# Gals2 = SchechterEvolve(Galaxies, 3, 0, 0.3, 0, 0.7, "LCDM")
-# 
-# for i in range(0,100,10):
-#     plt.hist(Gals2[i], bins = 100, alpha = 0.4, label = "z = %2.3f"%(zArray[-i]))
-#     plt.title("Monte Carlo simulation of galaxies with %i galaxies"%(GalaxyNumber))
-#     plt.xlabel("Mass (dex)")
-#     plt.ylabel("Number of galaxies")
-#     plt.yscale("log")
-#     #plt.plot()
-# 
-# plt.legend()
-# plt.show()
-# 
-# 
-# # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# # Now let's fit some stuff:
-# 
-# 
-# 
-# fit = fitChisq.ls_fit(MassArray, FitToSchechter, np.sqrt(FitToSchechter), schechter_mass)
-# 
-# print(fit)
-# 
-# 
-# 
-# def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
-# 	# Returns Schechter function as a function of mass
-# 	# mass shall be given in the unit of dex (i.e. mass = log10(mass_in_solar_mass) )
-# 	# Will be in unit of dex^-1 Mpc^-3
-# 	mass_diff = mass - break_mass
-# 	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
-# 
-# 
-# 
-# 
+# Now for the actual simulation on the galaxies we've created from the Schechter PCF
+
+def StarForm(mass, time): # What is our star formation rate function?
+    return 5*10**8 #in SOLAR MASS PER GYR!!!!!
+
+def SchechterEvolve(galaxies, StartZ, EndZ, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+    zArray = np.linspace(StartZ, EndZ, num=100)
+    Times = LBTimeVec(zArray, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)
+    
+    dt = [Times[n+1]-Times[n] for n in range(len(Times)-1)]
+    
+    #print(dt)
+    
+    #Evolution = [[np.log10(10**gal + StarForm(gal,t)*dt) for i, gal in enumerate(galaxies)]for n, t in enumerate(dt)]
+    Evolution = np.zeros((len(dt), len(galaxies)), dtype = "float32")
+    Evolution[0] = galaxies
+    
+    for n in range(len(dt)-1):
+        GalLine = np.array([np.log10(10**Evolution[n, i] - StarForm(Evolution[n, i],Times[n])*dt[n]) for i in range(len(galaxies))], dtype = "float32")
+        Evolution[n+1] = GalLine
+        #print(GalLine)
+    return Evolution
+
+Gals1 = SchechterEvolve(Galaxies, 0, 3, 0.3, 0, 0.7, "LCDM")
+
+zArray = np.linspace(0, 3, num=100)
+
+for i in range(0,100,10):
+    plt.hist(Gals1[i], bins = 100, alpha = 0.4, label = "z = %2.3f"%(zArray[i]))
+    plt.title("Monte Carlo simulation of galaxies with %i galaxies"%(GalaxyNumber))
+    plt.xlabel("Mass (dex)")
+    plt.ylabel("Number of galaxies")
+    plt.yscale("log")
+    #plt.plot()
+
+plt.legend()
+plt.show()
+
+Gals2 = SchechterEvolve(Galaxies, 3, 0, 0.3, 0, 0.7, "LCDM")
+
+for i in range(0,100,10):
+    plt.hist(Gals2[i], bins = 100, alpha = 0.4, label = "z = %2.3f"%(zArray[-i]))
+    plt.title("Monte Carlo simulation of galaxies with %i galaxies"%(GalaxyNumber))
+    plt.xlabel("Mass (dex)")
+    plt.ylabel("Number of galaxies")
+    plt.yscale("log")
+    #plt.plot()
+
+plt.legend()
+plt.show()
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Now let's fit some stuff:
+
+
+
+fit = fitChisq.ls_fit(MassArray, FitToSchechter, np.sqrt(FitToSchechter), schechter_mass)
+
+print(fit)
+
+
+
+def schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2):
+	# Returns Schechter function as a function of mass
+	# mass shall be given in the unit of dex (i.e. mass = log10(mass_in_solar_mass) )
+	# Will be in unit of dex^-1 Mpc^-3
+	mass_diff = mass - break_mass
+	return np.log(10) * np.exp(- np.power(10, mass_diff)) * (phi1 * np.power(10, alpha1 * mass_diff) + phi2 * np.power(10, alpha2 * mass_diff)) * np.power(10, mass_diff)
+
+
+
+
 # =============================================================================
 
 

@@ -31,14 +31,14 @@ alpha = findVol.alpha
 
 # Constants and Settings
 h_today = 0.7
-magnitude_min = 26
+magnitude_min = 28
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 3
-z = np.linspace(0.01,z_ref,50*z_ref/3)
+z = np.linspace(0.01,z_ref,round(50*z_ref/3))
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
 # sqds = np.array([1,10,20,50]) # square degree on the sky obsesrved
-sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
-# sqds = np.array([1,3,5,10])
+# sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
+sqds = np.array([1,3,5,10])
 
 # Set the subfloder where the figure outputs will be placed
 save_path = cur_path + '/figures/wcomp/reldif'
@@ -206,10 +206,10 @@ for sqd in sqds:
 fig2, ax2 = plt.subplots()
 ax2.set_ylabel(r'Statistical significance ($\sigma$)', fontsize=13)
 ax2.set_xlabel(r'Observed area (square degree)', fontsize=13)
-ax2.plot(sqds, sd_w1w8, '--', label = 'between w=1 and 0.8')
-ax2.plot(sqds, sd_w1w9, '-.', label = 'between w=1 and 0.9')
-ax2.plot(sqds, sd_w1w11, ':', label = 'between w=1 and 1.1')
-ax2.plot(sqds, sd_w1w12, '-', label = 'between w=1 and 1.2')
+ax2.plot(sqds, sd_w1w8, '--', label = 'between w=-1 and -0.8')
+ax2.plot(sqds, sd_w1w9, '-.', label = 'between w=-1 and -0.9')
+ax2.plot(sqds, sd_w1w11, ':', label = 'between w=-1 and -1.1')
+# ax2.plot(sqds, sd_w1w12, '-', label = 'between w=1 and 1.2')
 
 ax2.legend()
 plt.rc('xtick', labelsize=11)

@@ -31,10 +31,10 @@ alpha = findVol.alpha
 
 # Constants and Settings
 h_today = 0.7
-magnitude_min = 26
+magnitude_min = 28
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 3
-z = np.linspace(0.01,z_ref,50*z_ref/3)
+z = np.linspace(0.01,z_ref,round(50*z_ref/3))
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
 # sqds = np.array([1,10,20,50]) # square degree on the sky obsesrved
 sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
