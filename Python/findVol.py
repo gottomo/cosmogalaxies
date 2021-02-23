@@ -138,6 +138,8 @@ def mag_to_mass_old(mag, z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0
 	mass = np.log10(lum) + np.log10(5)
 	return mass
 
+# The functions that uses fixed magnitude limit-----------------------
+
 def galaxy_no_density(z, mag, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	# Returns the number density of galaxies as a function of redshift for a given magnitude limit with given cosmology model
 	# In the unit of Mpc^-3
@@ -242,15 +244,58 @@ def alpha(z, a, b):
 	# Returns the parameter alpha for single shcechter function as a function of z using fitting parameters alpha = a * z + b
 	return a * z + b
 
-def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+# -----------------The functions that uses fixed mass limit-----------------------
+
+def mass_limit_rel_to_LCDM(z, mass, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
     Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
     diff = Fraction **2
-    return diff
+    return diff * mass
 	
-def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
-    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
-    diff = Fraction **2
-    return diff
+#def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+#    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
+#    diff = Fraction **2
+#    return diff
+
+def galaxy_no_density_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+	# Returns the number density of galaxies as a function of redshift for a given magnitude limit with given cosmology model
+	# In the unit of Mpc^-3
+	
+	mass_min = mass_limit_rel_to_LCDM(z, mass, omega_m, omega_k, omega_0, model, w_0, w_1, h)
+	
+	return integrate.quad(lambda mass: schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2), mass_min, 15)[0]
+	
+def galaxy_number_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+	
+	number = galaxy_no_density_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * comoving_vol_elm(z, omega_m, omega_k, omega_0, model, w_0, w_1, h)
+	return number
+
+def delta_galaxy_number_rel_z_masslim(z, z_ref, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+	# Returns the difference in number density of galaxies between an arbitrary z and a set z
+	number_z_ref = galaxy_number_masslim(z_ref, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h)
+	number = galaxy_number_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h)
+	# print(model)
+	# print("number: " + str(number))
+	# print("number_z: " + str(number_z_ref))
+	rel = (number - number_z_ref) / number_z_ref
+	return rel
+
+def d_delta_galaxy_number_rel_z_masslim(z, z_ref, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, sqd=1, w_0=-1, w_1=0, h=0.7):
+	# Returns the uncertianty of difference in number density of galaxies between an arbitrary z and a set z
+	# Not the most ideal way to do things, by calling this function alongside the delta_galaxy_number_rel_z(), we're doing twice the work
+	number_z_ref = galaxy_number_masslim(z_ref, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+	number = galaxy_number_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+	# print(model)
+	# print("number: " + str(number))
+	# print("number_z: " + str(number_z_ref))
+	# Error analysis
+	d_number = np.sqrt(number)
+	d_number_z_ref = np.sqrt(number_z_ref)
+	rel = (number - number_z_ref) / number_z_ref
+	if(number!=number_z_ref):
+		d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
+	else:
+		d_rel=0
+	return d_rel
 
 #---------------- functions for galaxy mergers--------------------------------------
 def LBTime(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
@@ -328,6 +373,11 @@ alpha_vec = np.vectorize(alpha)
 LBTimeVec = np.vectorize(LBTime)
 Phi_directVec = np.vectorize(Phi_direct)
 ang_diameter_d_vec = np.vectorize(ang_diameter_d)
+mass_limit_rel_to_LCDM_vec = np.vectorize(mass_limit_rel_to_LCDM)
+galaxy_no_density_masslim_vec = np.vectorize(galaxy_no_density_masslim)
+galaxy_number_masslim_vec = np.vectorize(galaxy_number_masslim)
+delta_galaxy_number_rel_z_masslim_vec = np.vectorize(delta_galaxy_number_rel_z_masslim)
+d_delta_galaxy_number_rel_z_masslim_vec = np.vectorize(d_delta_galaxy_number_rel_z_masslim)
 
 # ------------------------------------------Set the constants-------------------------------------------
 h_today = 0.7
@@ -354,64 +404,64 @@ cur_path = os.path.dirname(__file__) # get the directory where the script is pla
 
 # ---------------------------Comoving volume element------------------------------
 # Plots of comoving volume element per uint solid angle per unit redshift, normalized by 1/(D_H)^3
-fig1, ax1 = plt.subplots()
-ax1.set_xlabel(r"Redshift $z$", fontsize=13)
-ax1.set_ylabel(r"Dimensionless comoving volume element $\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$", fontsize=13)
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', -1, 0, h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
-ax1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'LCDM', -1, 0, h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', -1, 0, h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -0.8, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,1)), label='w = -0.8')
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -0.9, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,2)), label='w = -0.9')
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -1.1, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,3)), label='w = -1.1')
-ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -1.2, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,4)), label='w = -1.2')
+# fig1, ax1 = plt.subplots()
+# ax1.set_xlabel(r"Redshift $z$", fontsize=13)
+# ax1.set_ylabel(r"Dimensionless comoving volume element $\frac{dV_C}{d\Omega dz}  \frac{1}{H_0^3}$", fontsize=13)
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', -1, 0, h=h_today) / (3000/h_today)**3, '-', label='LCDM') # LCDM
+# ax1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'LCDM', -1, 0, h=h_today) / (3000/h_today)**3, '--', label='E-deS') # E-deS
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', -1, 0, h=h_today) / (3000/h_today)**3, '-.', label='OCDM') # OCDM
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -0.8, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,1)), label='w = -0.8')
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -0.9, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,2)), label='w = -0.9')
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -1.1, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,3)), label='w = -1.1')
+# ax1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'constant_w', -1.2, 0, h_today) / (3000/h_today)**3, linestyle=(0, (1,4)), label='w = -1.2')
 
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax1.legend()
-plt.tight_layout()
-save_path = cur_path + '/figures/'
-fig1.savefig(save_path + 'comoving_volelm_dimless' + '_zref' + str(z_ref) + '.png')
-fig1.savefig(save_path + 'comoving_volelm_dimless' + '_zref' + str(z_ref) + '.pdf')
-plt.clf()
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1.legend()
+# plt.tight_layout()
+# save_path = cur_path + '/figures/'
+# fig1.savefig(save_path + 'comoving_volelm_dimless' + '_zref' + str(z_ref) + '.png')
+# fig1.savefig(save_path + 'comoving_volelm_dimless' + '_zref' + str(z_ref) + '.pdf')
+# plt.clf()
 
-fig1_1, ax1_1 = plt.subplots()
-ax1_1.set_xlabel(r"Redshift $z$", fontsize=13)
-ax1_1.set_ylabel(r"Comoving volume element $\frac{dV_C}{d\Omega dz}$ (Mpc$^3$)", fontsize=13)
-ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM') # LCDM
-ax1_1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS') # E-deS
-ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', label='OCDM') # OCDM
-ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), linestyle=(0, (1,1)), label='w = -0.8')
-ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), linestyle=(0, (1,2)), label='w = -0.9')
-ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), linestyle=(0, (1,3)), label='w = -1.1')
-ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), linestyle=(0, (1,4)), label='w = -1.2')
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax1_1.legend()
-plt.tight_layout()
-save_path = cur_path + '/figures/'
-fig1_1.savefig(save_path + 'comoving_volelm' + '_zref' + str(z_ref) + '.png')
-fig1_1.savefig(save_path + 'comoving_volelm' + '_zref' + str(z_ref) + '.pdf')
-plt.clf()
+# fig1_1, ax1_1 = plt.subplots()
+# ax1_1.set_xlabel(r"Redshift $z$", fontsize=13)
+# ax1_1.set_ylabel(r"Comoving volume element $\frac{dV_C}{d\Omega dz}$ (Mpc$^3$)", fontsize=13)
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM') # LCDM
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS') # E-deS
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', label='OCDM') # OCDM
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), linestyle=(0, (1,1)), label='w = -0.8')
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), linestyle=(0, (1,2)), label='w = -0.9')
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), linestyle=(0, (1,3)), label='w = -1.1')
+# ax1_1.plot(z, comoving_vol_elm_vec(z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), linestyle=(0, (1,4)), label='w = -1.2')
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1_1.legend()
+# plt.tight_layout()
+# save_path = cur_path + '/figures/'
+# fig1_1.savefig(save_path + 'comoving_volelm' + '_zref' + str(z_ref) + '.png')
+# fig1_1.savefig(save_path + 'comoving_volelm' + '_zref' + str(z_ref) + '.pdf')
+# plt.clf()
 
 # ------------------Angular diameter distance---------------------------
-fig2, ax2 = plt.subplots()
-ax2.set_xlabel("Redshift z", fontsize=13)
-ax2.set_ylabel(r"Angular diameter distance $d_A$ (Mpc)", fontsize=13)
-# Plots of comoving volume element per uint solid angle per unit redshift, normalized by 1/(D_H)^3
-ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM') # LCDM
-ax2.plot(z, ang_diameter_d_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS') # E-deS
-ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', label='OCDM') # OCDM
-ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
-# plt.plot(z, ang_diameter_d(z, 0.3, 0, 0.7, model = 'linear', w_0 = -0.9 , h=h_today) / (3000/h_today)**3, label='linear')
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax2.legend()
-plt.tight_layout()
-fig2.savefig(save_path + 'and_distance' + '_zref' + str(z_ref) + '.png')
-fig2.savefig(save_path + 'ang_distance' + '_zref' + str(z_ref) + '.pdf')
+# fig2, ax2 = plt.subplots()
+# ax2.set_xlabel("Redshift z", fontsize=13)
+# ax2.set_ylabel(r"Angular diameter distance $d_A$ (Mpc)", fontsize=13)
+# # Plots of comoving volume element per uint solid angle per unit redshift, normalized by 1/(D_H)^3
+# ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM') # LCDM
+# ax2.plot(z, ang_diameter_d_vec(z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS') # E-deS
+# ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', label='OCDM') # OCDM
+# ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax2.plot(z, ang_diameter_d_vec(z, 0.3, 0, 0.7, 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+# # plt.plot(z, ang_diameter_d(z, 0.3, 0, 0.7, model = 'linear', w_0 = -0.9 , h=h_today) / (3000/h_today)**3, label='linear')
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax2.legend()
+# plt.tight_layout()
+# fig2.savefig(save_path + 'and_distance' + '_zref' + str(z_ref) + '.png')
+# fig2.savefig(save_path + 'ang_distance' + '_zref' + str(z_ref) + '.pdf')
 
 
 # -----------------------Plot of delta_com_vol_elm--------------------------------
@@ -429,7 +479,7 @@ fig2.savefig(save_path + 'ang_distance' + '_zref' + str(z_ref) + '.pdf')
 # fig3.legend(loc=5)
 # plt.grid()
 
-mass_dex_array = np.linspace(7,12,200)
+# mass_dex_array = np.linspace(7,12,200)
 
 # -------------------Plot of schechter function as a function of mass---------------------------
 # This one using the equation from A. Mortlock (2015) paper, all mass in unit of dex
@@ -474,45 +524,70 @@ mass_dex_array = np.linspace(7,12,200)
 # plt.grid()
 
 #---------------Plot of absolute number of galaxies per sqd---------------
+# save_path = cur_path + '/figures/'
+# fig7, ax7 = plt.subplots()
+# ax7.set_ylabel(r"$\frac{dN}{dz}$")
+# ax7.set_xlabel(r"$z$")
+# # ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+# ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
+
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# plt.tight_layout()
+# ax7.legend()
+# plt.show()
+# fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.png')
+# fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.pdf')
+# plt.clf()
+#---------------Plot of absolute number of galaxies per sqd for fixed mass limit---------------
 fig7, ax7 = plt.subplots()
 ax7.set_ylabel(r"$\frac{dN}{dz}$")
 ax7.set_xlabel(r"$z$")
 # ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
-ax7.plot(z, galaxy_number_vec(z, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
+mass_min = 11
+save_path = cur_path + '/figures/'
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
 
 plt.rc('xtick', labelsize=11)
 plt.rc('ytick', labelsize=11)
 plt.tight_layout()
 ax7.legend()
-fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.png')
-fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.pdf')
+plt.show()
+fig7.savefig(save_path + 'dndz' + '_masslim' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '.png')
+# fig7.savefig(save_path + 'dndz' + '_masslim' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '.pdf')
 plt.clf()
 #------------Plot of minimum mass of galaxies observable for a given magnitude thres.-----------
-fig8, ax8 = plt.subplots()
-ax8.set_ylabel(r"Mass (dex)")
-ax8.set_xlabel(r"$z$")
-# ax8.set_title('The lightest galaxy observable with the apparent magnitude threshold of ' + str(magnitude_min))
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
-ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
+# fig8, ax8 = plt.subplots()
+# ax8.set_ylabel(r"Mass (dex)")
+# ax8.set_xlabel(r"$z$")
+# # ax8.set_title('The lightest galaxy observable with the apparent magnitude threshold of ' + str(magnitude_min))
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', label='LCDM')
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 1, 0, 0, 'LCDM', h=h_today), '--', label='E-deS')
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0.7, 0, 'LCDM', h=h_today), '-', label='OCDM')
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), ':', label='w = -0.8')
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), ':', label='w = -0.9')
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), ':', label='w = -1.1')
+# ax8.plot(z, mag_to_mass_vec(magnitude_min, z, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), ':', label='w = -1.2')
 
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-plt.tight_layout()
-ax8.legend()
-fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.png')
-fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.pdf')
-plt.clf()
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# plt.tight_layout()
+# ax8.legend()
+# fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.png')
+# fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.pdf')
+# plt.clf()
 #------------Plot of apparent magnitude vs absolute magnitude-----------
 # fig8, ax8 = plt.subplots()
 # ax8.set_ylabel(r"absolute magnitude")
@@ -902,23 +977,23 @@ plt.clf()
 # plt.grid()
 
 # ---------------Plots of Schechter function at different redshift for varying phi
-fig21, ax21 = plt.subplots()
-ax21.set_xlabel(r"$M$ $(dex)$")
-ax21.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {Mpc}^{-3}$)")
-# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '-', label='z=0')
-ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 11.12, 6.31e-4, 0, alpha(0.5, -0.093, -1.3), 0), label='z=0.5')
-# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(1, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '--', label='z=1')
-ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 11.12, 6.31e-4, 0, alpha(1.5, -0.093, -1.3), 0), label='z=1.5')
-# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(2, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '-.', label='z=2')
-ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 11.12, 6.31e-4, 0, alpha(2.5, -0.093, -1.3), 0), label='z=2.5')
-# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), ':', label='z=3')
-ax21.set_yscale('log')
-ax21.legend()
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-plt.tight_layout()
-fig21.savefig(save_path + 'schechter_vara' + '_mag' + str(magnitude_min) + '.png')
-fig21.savefig(save_path + 'schechter_vara' + '_mag' + str(magnitude_min) + '.pdf')
-plt.clf()
+# fig21, ax21 = plt.subplots()
+# ax21.set_xlabel(r"$M$ $(dex)$")
+# ax21.set_ylabel(r"$\phi (M)$ (${dex}^{-1} {Mpc}^{-3}$)")
+# # ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(0, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '-', label='z=0')
+# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 11.12, 6.31e-4, 0, alpha(0.5, -0.093, -1.3), 0), label='z=0.5')
+# # ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(1, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '--', label='z=1')
+# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 11.12, 6.31e-4, 0, alpha(1.5, -0.093, -1.3), 0), label='z=1.5')
+# # ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(2, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), '-.', label='z=2')
+# ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 11.12, 6.31e-4, 0, alpha(2.5, -0.093, -1.3), 0), label='z=2.5')
+# # ax21.plot(mass_dex_array, schechter_mass_vec(mass_dex_array, 10.66, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(0, -0.093, -1.3), 0), ':', label='z=3')
+# ax21.set_yscale('log')
+# ax21.legend()
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# plt.tight_layout()
+# fig21.savefig(save_path + 'schechter_vara' + '_mag' + str(magnitude_min) + '.png')
+# fig21.savefig(save_path + 'schechter_vara' + '_mag' + str(magnitude_min) + '.pdf')
+# plt.clf()
 
 # plt.show()
