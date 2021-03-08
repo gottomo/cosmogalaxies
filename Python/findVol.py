@@ -249,7 +249,7 @@ def alpha(z, a, b):
 def mass_limit_rel_to_LCDM(z, mass, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
     Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
     diff = Fraction **2
-    return np.log10(diff * mass)
+    return np.log10(diff) + mass
 	
 #def mass_limit_rel_to_LCDM(z, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 #    Fraction = (lum_d(z, omega_m, omega_k, omega_0, model, w_0=w_0, w_1=w_1, h=h)/lum_d(z, 0.3, 0, 0.7, "LCDM", w_0=-1, w_1=0, h=0.7))
@@ -351,6 +351,10 @@ def Phi_direct(z, mass, OriginalPhi, omega_m, omega_k, omega_0, model, w_0=-1, w
     
     
     return np.exp(integral[0]) * OriginalPhi
+
+# ----------- functions that integrate the comoving volume and then calculate the galaxy numbers in given redshift bins ---------
+# Placeholder.  If the codes work properly as tested in the binned_comoving_volume.py, they wil be added here
+
 
 Merger_Rate_SnyderVec = np.vectorize(Merger_Rate_Snyder)
 
@@ -524,7 +528,7 @@ cur_path = os.path.dirname(__file__) # get the directory where the script is pla
 # plt.grid()
 
 #---------------Plot of absolute number of galaxies per sqd---------------
-# save_path = cur_path + '/figures/'
+save_path = cur_path + '/figures/'
 # fig7, ax7 = plt.subplots()
 # ax7.set_ylabel(r"$\frac{dN}{dz}$")
 # ax7.set_xlabel(r"$z$")
@@ -543,31 +547,31 @@ cur_path = os.path.dirname(__file__) # get the directory where the script is pla
 # ax7.legend()
 # plt.show()
 # fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.png')
-# fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.pdf')
+# # fig7.savefig(save_path + 'dndz' + '_zref' + str(z_ref) + '_mag' + str(magnitude_min) + '.pdf')
 # plt.clf()
 #---------------Plot of absolute number of galaxies per sqd for fixed mass limit---------------
-# fig7, ax7 = plt.subplots()
-# ax7.set_ylabel(r"$\frac{dN}{dz}$")
-# ax7.set_xlabel(r"$z$")
-# # ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
-# mass_min = 11
-# save_path = cur_path + '/figures/'
-# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
-# # ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
-# # ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
-# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
-# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
-# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
-# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
+fig7, ax7 = plt.subplots()
+ax7.set_ylabel(r"$\frac{dN}{dz}$")
+ax7.set_xlabel(r"$z$")
+# ax7.set_title("min. app. magnitude = " + str(magnitude_min) + ", per square degree")
+mass_min = 10
+save_path = cur_path + '/figures/'
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today) * one_sqr_degree, '-', label='LCDM')
+# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 1, 0, 0, 'LCDM', h=h_today) * one_sqr_degree, '--', label='E-deS')
+# ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today) * one_sqr_degree, '-', label='OCDM')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today) * one_sqr_degree, ':', label='w = -0.8')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today) * one_sqr_degree, ':', label='w = -0.9')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today) * one_sqr_degree, ':', label='w = -1.1')
+ax7.plot(z, galaxy_number_masslim_vec(z, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today) * one_sqr_degree, ':', label='w = -1.2')
 
-# plt.rc('xtick', labelsize=11)
-# plt.rc('ytick', labelsize=11)
-# plt.tight_layout()
-# ax7.legend()
-# plt.show()
-# fig7.savefig(save_path + 'dndz' + '_masslim' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '.png')
-# # fig7.savefig(save_path + 'dndz' + '_masslim' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '.pdf')
-# plt.clf()
+plt.rc('xtick', labelsize=11)
+plt.rc('ytick', labelsize=11)
+plt.tight_layout()
+ax7.legend()
+plt.show()
+fig7.savefig(save_path + 'dndz' + '_masslim' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '.png')
+# fig7.savefig(save_path + 'dndz' + '_masslim' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '.pdf')
+plt.clf()
 #------------Plot of minimum mass of galaxies observable for a given magnitude thres.-----------
 # fig8, ax8 = plt.subplots()
 # ax8.set_ylabel(r"Mass (dex)")
@@ -585,8 +589,8 @@ cur_path = os.path.dirname(__file__) # get the directory where the script is pla
 # plt.rc('ytick', labelsize=11)
 # plt.tight_layout()
 # ax8.legend()
-# fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.png')
-# fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.pdf')
+# # fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.png')
+# # fig8.savefig(save_path + 'magvsmass' + '_mag' + str(magnitude_min) + '.pdf')
 # plt.clf()
 #------------Plot of apparent magnitude vs absolute magnitude-----------
 # fig8, ax8 = plt.subplots()

@@ -35,14 +35,14 @@ d_delta_galaxy_number_rel_z_masslim_vec = np.vectorize(findVol.d_delta_galaxy_nu
 
 # Constants and Settings
 h_today = 0.7
-mass_min = 10
+mass_min = 11
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 3
 z = np.linspace(0.01,z_ref,round(50*z_ref/3))
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
 # sqds = np.array([1,10,20,50]) # square degree on the sky obsesrved
-# sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
-sqds = np.array([1,3,5,10])
+sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
+# sqds = np.array([1,3,5,10])
 
 # Set the subfloder where the figure outputs will be placed
 save_path = cur_path + '/figures/wcomp_masslim/reldif'
@@ -249,3 +249,4 @@ plt.rc('ytick', labelsize=11)
 plt.tight_layout()
 fig2.savefig(save_path + '_sd' + '_wcomp' + '_var' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '_sqd' + str(sqds[0]) + 'to' + str(sqds[np.size(sqds)-1]) + '_wErr' + '.png')
 # fig2.savefig(report_save_path + '_sd' + '_wcomp' + '_var' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '_sqd' + str(sqds[0]) + 'to' + str(sqds[np.size(sqds)-1]) + '_wErr' + '.pdf', format='pdf')
+plt.show()
