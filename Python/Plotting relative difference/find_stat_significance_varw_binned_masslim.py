@@ -41,14 +41,24 @@ h_today = 0.7
 mass_min = 11
 one_sqr_degree = (np.pi/180)**2 
 z_ref = 3
-z = np.linspace(0.01,z_ref,round(50*z_ref/3))
+bin_size = 0.25
+z_array = np.linspace(0.01,z_ref,round(z_ref/bin_size))
 modelname = np.array(['LCDM', 'EdS', 'OCDM', 'w8', 'w9', 'w11', 'w12'])
-# sqds = np.array([1,10,20,50]) # square degree on the sky obsesrved
-sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
+sqds = np.array([1,10,20,50]) # square degree on the sky obsesrved
+# sqds = np.array([0.05,0.1,0.2,0.3,0.5,0.7,1])
 # sqds = np.array([1,3,5,10])
 
+# Create bins* of redshift from an array of redshifts
+# * Here a "bin" means the average value of adjucent redshifts, which would be placed in the centre of a bin
+z_bin = np.array([])
+i=0
+for zs in z_array:
+    if(i+1<z_array.size):
+        z_bin = np.append(z_bin, (zs + z_array[i+1])/2)
+    i=i+1
+
 # Set the subfloder where the figure outputs will be placed
-save_path = cur_path + '/figures/wcomp_masslim/reldif'
+save_path = cur_path + '/figures/wcomp_masslim_binned/reldif'
 
 
 # Plotting how the mass limit looks like at different redshift
@@ -160,7 +170,7 @@ save_path = cur_path + '/figures/wcomp_masslim/reldif'
 
 
 # ------------------------Relative difference using varying phi and alpha, comparing different w-----------------------------------------------------
-save_path = cur_path + '/figures/wcomp_cmplt_masslim/reldif'
+save_path = cur_path + '/figures/wcomp_masslim_binned/reldif'
 report_save_path = os.path.abspath(os.path.join(module_path, '..')) + '/PlotsForReports/reldif'
 
 # Initialize arrays for storing standard deviations between models with different Hubble parameters h
@@ -170,46 +180,39 @@ sd_w1w11 = np.array([])
 sd_w1w12 = np.array([])
 
 for sqd in sqds:
-    rel_num_LCDM = delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-    rel_num_w8 = delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today)
-    rel_num_w9 = delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today)
-    rel_num_w11 = delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today)
-    rel_num_w12 = delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today)
-
-
-    d_rel_num_LCDM = d_delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', sqd, h=h_today)
-    d_rel_num_w8 = d_delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', sqd, -0.8, h=h_today)
-    d_rel_num_w9 = d_delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', sqd, -0.9, h=h_today)
-    d_rel_num_w11 = d_delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', sqd, -1.1, h=h_today)
-    d_rel_num_w12 = d_delta_galaxy_number_rel_z_masslim_vec(z, z_ref, mass_min, 11.12, Phi_directVec(z, 11, 2.88e-3, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), 0, alpha(z, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', sqd, -1.2, h=h_today)
+    rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
+    rel_num_w8, d_rel_num_w8 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
+    rel_num_w9, d_rel_num_w9 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
+    rel_num_w11, d_rel_num_w11 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
+    rel_num_w12, d_rel_num_w12 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
 
     # Find where the max separation is, then find the standard deviation for that separation between different h
     print("sqd: " + str(sqd))
     sep = np.abs(rel_num_LCDM - rel_num_w8)
     max_sep = np.amax(np.abs(sep))
     max_index = np.where(sep == max_sep)
-    print("w1w8: " + str(z[max_index]))
+    print("w1w8: " + str(z_bin[max_index]))
     sigma = np.sqrt(d_rel_num_LCDM[max_index]**2 + d_rel_num_w8[max_index]**2)
     sd_w1w8 = np.append(sd_w1w8, max_sep / sigma)
 
     sep = np.abs(rel_num_LCDM - rel_num_w9)
     max_sep = np.amax(sep)
     max_index = np.where(sep == max_sep)
-    print("w1w9: " + str(z[max_index]))
+    print("w1w9: " + str(z_bin[max_index]))
     sigma = np.sqrt(d_rel_num_LCDM[max_index]**2 + d_rel_num_w9[max_index]**2)
     sd_w1w9 = np.append(sd_w1w9, max_sep / sigma)
 
     sep = np.abs(rel_num_LCDM - rel_num_w11)
     max_sep = np.amax(sep)
     max_index = np.where(sep == max_sep)
-    print("w1w11: " + str(z[max_index]))
+    print("w1w11: " + str(z_bin[max_index]))
     sigma = np.sqrt(d_rel_num_LCDM[max_index]**2 + d_rel_num_w11[max_index]**2)
     sd_w1w11 = np.append(sd_w1w11, max_sep / sigma)
 
     sep = np.abs(rel_num_LCDM - d_rel_num_w12)
     max_sep = np.amax(sep)
     max_index = np.where(sep == max_sep)
-    print("w1w12: " + str(z[max_index]))
+    print("w1w12: " + str(z_bin[max_index]))
     sigma = np.sqrt(d_rel_num_LCDM[max_index]**2 + d_rel_num_w12[max_index]**2)
     sd_w1w12 = np.append(sd_w1w12, max_sep / sigma)
 
@@ -218,23 +221,23 @@ for sqd in sqds:
     ax1.set_ylabel(r"$\Delta_{rel}\frac{dN}{dz}$ between $z$ and $z=$" + str(z_ref), fontsize=13 )
     ax1.set_xlabel(r"$Redshift (z)$", fontsize=13)
     # ax1.set_title("min. app. magnitude = " + str(mass_min))
-    ax1.plot(z, rel_num_LCDM, '-', label='LCDM')
-    ax1.plot(z, rel_num_w8, ':', label='w = -0.8')
-    ax1.plot(z, rel_num_w9, ':', label='w = -0.9')
-    ax1.plot(z, rel_num_w11, '-.', label='w = -1.1')
-    ax1.plot(z, rel_num_w12, '-.', label='w = -1.2')
-    
-    ax1.fill_between(z, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
-    ax1.fill_between(z, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
-    ax1.fill_between(z, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
-    ax1.fill_between(z, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
-    ax1.fill_between(z, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
+    ax1.plot(z_bin, rel_num_LCDM, '.', marker='.', label='LCDM')
+    ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
+    ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
+    ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
+    ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
+        
+    ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
+    ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
+    ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
+    ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
+    ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
 
     plt.rc('xtick', labelsize=11)
     plt.rc('ytick', labelsize=11)
     ax1.legend()
     plt.tight_layout()
-    fig1.savefig(save_path + '_wcomp' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
+    fig1.savefig(save_path + '_wcomp' + '_binsize' + str(bin_size) + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
     # fig1.savefig(report_save_path + '_wcomp' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.pdf', format='pdf')
 
 # Plot the standard deviation as a function of sky area observed
@@ -250,6 +253,6 @@ ax2.legend()
 plt.rc('xtick', labelsize=11)
 plt.rc('ytick', labelsize=11)
 plt.tight_layout()
-fig2.savefig(save_path + '_sd' + '_wcomp' + '_var' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '_sqd' + str(sqds[0]) + 'to' + str(sqds[np.size(sqds)-1]) + '_wErr' + '.png')
+fig2.savefig(save_path + '_sd' + '_wcomp' + '_binsize' + str(bin_size) + '_var' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '_sqd' + str(sqds[0]) + 'to' + str(sqds[np.size(sqds)-1]) + '_wErr' + '.png')
 # fig2.savefig(report_save_path + '_sd' + '_wcomp' + '_var' + '_zref' + str(z_ref) + '_minMass' + str(mass_min) + '_sqd' + str(sqds[0]) + 'to' + str(sqds[np.size(sqds)-1]) + '_wErr' + '.pdf', format='pdf')
 plt.show()

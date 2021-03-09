@@ -78,6 +78,33 @@ def delta_galaxy_number_rel_z_comb(z, z_ref, mag, break_mass, phi1, phi2, alpha1
     d_rel[-1] = 0
     return rel, d_rel
 
+def delta_galaxy_number_rel_z_comb_masslim(z, z_ref, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7, sqd=1):
+    # Returns the difference in number density of galaxies between an arbitrary z and a set z
+    z_bin = np.array([])
+    volume = np.array([])
+    i=0
+    for zs in z:
+        if(i+1<z.size):
+            volume = np.append(volume, integrate.quad(lambda Z: findVol.comoving_vol_elm(Z, omega_m, omega_k, omega_0, model, w_0, w_1, h), zs, z[i+1])[0])
+            z_bin = np.append(z_bin, (zs + z[i+1])/2)
+        i=i+1
+    number = volume * galaxy_no_density_masslim_vec(z_bin, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0, w_1, h) * one_sqr_degree * sqd
+    number_z_ref = number[-1]
+    # print(model)
+    # print("number: " + str(number))
+    # print("number_z: " + str(number_z_ref))
+    rel = (number - number_z_ref) / number_z_ref
+    d_number = np.sqrt(number)
+    d_number_z_ref = np.sqrt(number_z_ref)
+    rel = (number - number_z_ref) / number_z_ref
+    # if(number!=number_z_ref):
+    #     d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
+    # else:
+    #     d_rel=0
+    with np.errstate(divide='ignore', invalid='ignore'):
+        d_rel = np.sqrt((d_number**2+d_number_z_ref**2)/(number-number_z_ref)**2 + (d_number_z_ref/number_z_ref)**2) * rel
+    d_rel[-1] = 0
+    return rel, d_rel
 
 # Vectorize the functions
 comoving_vol_elm_vec = np.vectorize(findVol.comoving_vol_elm)
@@ -108,6 +135,8 @@ alpha = findVol.alpha
 comoving_vol_vec = np.vectorize(comoving_vol)
 galaxy_number_bin_vec = np.vectorize(galaxy_number_bin)
 delta_galaxy_number_rel_z_comb_vec = np.vectorize(delta_galaxy_number_rel_z_comb)
+
+delta_galaxy_number_rel_z_comb_masslim_vec = np.vectorize(delta_galaxy_number_rel_z_comb_masslim)
 
 h_today = 0.7
 magnitude_min = 26
@@ -172,33 +201,33 @@ for zs in z_array:
 
 # ------------- Relative number --------------------
 # Uses double schechter function
-fig1, ax1 = plt.subplots()
-ax1.set_ylabel(r"Galaxy numbers $N$")
-ax1.set_xlabel(r"$z$")
-rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
-rel_num_w8, d_rel_num_w8 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
-rel_num_w9, d_rel_num_w9 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
-rel_num_w11, d_rel_num_w11 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
-rel_num_w12, d_rel_num_w12 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
+# fig1, ax1 = plt.subplots()
+# ax1.set_ylabel(r"Galaxy numbers $N$")
+# ax1.set_xlabel(r"$z$")
+# rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_w8, d_rel_num_w8 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
+# rel_num_w9, d_rel_num_w9 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
+# rel_num_w11, d_rel_num_w11 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
+# rel_num_w12, d_rel_num_w12 = delta_galaxy_number_rel_z_comb(z_array, z_ref, magnitude_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
 
-ax1.plot(z_bin, rel_num_LCDM, '.', label='LCDM')
-ax1.plot(z_bin, rel_num_w8, ':', label='w = -0.8')
-ax1.plot(z_bin, rel_num_w9, ':', label='w = -0.9')
-ax1.plot(z_bin, rel_num_w11, '-.', label='w = -1.1')
-ax1.plot(z_bin, rel_num_w12, '-.', label='w = -1.2')
+# ax1.plot(z_bin, rel_num_LCDM, '.', marker='.', label='LCDM')
+# ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
+# ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
+# ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
+# ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
     
-ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
-ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
-ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
-ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
-ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
 
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax1.legend()
-plt.tight_layout()
-fig1.savefig(save_path + 'reldif' + '_binsize' + str(bin_size) + '_wcomp' + '_minM' + str(magnitude_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
-plt.show()
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1.legend()
+# plt.tight_layout()
+# fig1.savefig(save_path + 'reldif' + '_binsize' + str(bin_size) + '_wcomp' + '_minM' + str(magnitude_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
+# plt.show()
 # fig1.savefig(report_save_path + '_wcomp' + '_minM' + str(magnitude_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.pdf', format='pdf')
 
 
@@ -209,3 +238,66 @@ plt.show()
 # afunction_vec = np.vectorize(afunction)
 
 # afunction_vec(z_array)
+
+
+# ------------- Relative number with fixed mass limit --------------------
+mass_min = 10
+# Uses double schechter function
+# fig1, ax1 = plt.subplots()
+# ax1.set_ylabel(r"Galaxy numbers $N$")
+# ax1.set_xlabel(r"$z$")
+# rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_w8, d_rel_num_w8 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
+# rel_num_w9, d_rel_num_w9 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
+# rel_num_w11, d_rel_num_w11 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
+# rel_num_w12, d_rel_num_w12 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 10.66, 3.96e-3, 0.79e-3, -0.35, -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
+
+# ax1.plot(z_bin, rel_num_LCDM, '.', marker='.', label='LCDM')
+# ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
+# ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
+# ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
+# ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
+    
+# ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
+
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1.legend()
+# plt.tight_layout()
+# fig1.savefig(save_path + 'reldif' + '_binsize' + str(bin_size) + '_wcomp' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
+# plt.show()
+
+
+
+# Uses single schechter function with varying alpha
+# fig1, ax1 = plt.subplots()
+# ax1.set_ylabel(r"Galaxy numbers $N$")
+# ax1.set_xlabel(r"$z$")
+# rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_w8, d_rel_num_w8 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
+# rel_num_w9, d_rel_num_w9 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
+# rel_num_w11, d_rel_num_w11 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
+# rel_num_w12, d_rel_num_w12 = delta_galaxy_number_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
+
+# ax1.plot(z_bin, rel_num_LCDM, '.', marker='.', label='LCDM')
+# ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
+# ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
+# ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
+# ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
+    
+# ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
+# ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
+
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1.legend()
+# plt.tight_layout()
+# fig1.savefig(save_path + '_old' + 'reldif' + '_binsize' + str(bin_size) + '_var' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
+# plt.show()
