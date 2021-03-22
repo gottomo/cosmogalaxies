@@ -239,24 +239,24 @@ for zs in z_array:
 # plt.clf()
 
 # Plot comoving volume * 1/4*pi*d_A
-fig1_1, ax1_1 = plt.subplots()
-ax1_1.set_xlabel(r"Redshift $z$", fontsize=13)
-ax1_1.set_ylabel(r"Proper volume ${V_C}$ (Mpc$^3$)", fontsize=13)
-ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', marker='.', label='LCDM') # LCDM
-ax1_1.plot(z_bin, proper_volume(z_array, 1, 0, 0, 'LCDM', h=h_today), '--', marker='.', label='E-deS') # E-deS
-ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', marker='.', label='OCDM') # OCDM
-ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), marker='.', linestyle=(0, (1,1)), label='w = -0.8')
-ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), marker='.', linestyle=(0, (1,2)), label='w = -0.9')
-ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), marker='.', linestyle=(0, (1,3)), label='w = -1.1')
-ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), marker='.', linestyle=(0, (1,4)), label='w = -1.2')
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax1_1.legend()
-plt.tight_layout()
-fig1_1.savefig(save_path + 'proper_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.png')
-# fig1_1.savefig(save_path + 'comoving_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.pdf')
-plt.show()
-plt.clf()
+# fig1_1, ax1_1 = plt.subplots()
+# ax1_1.set_xlabel(r"Redshift $z$", fontsize=13)
+# ax1_1.set_ylabel(r"Proper volume ${V_C}$ (Mpc$^3$)", fontsize=13)
+# ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, 'LCDM', h=h_today), '-', marker='.', label='LCDM') # LCDM
+# ax1_1.plot(z_bin, proper_volume(z_array, 1, 0, 0, 'LCDM', h=h_today), '--', marker='.', label='E-deS') # E-deS
+# ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0.7, 0, 'LCDM', h=h_today), '-.', marker='.', label='OCDM') # OCDM
+# ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.8, h=h_today), marker='.', linestyle=(0, (1,1)), label='w = -0.8')
+# ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -0.9, h=h_today), marker='.', linestyle=(0, (1,2)), label='w = -0.9')
+# ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.1, h=h_today), marker='.', linestyle=(0, (1,3)), label='w = -1.1')
+# ax1_1.plot(z_bin, proper_volume(z_array, 0.3, 0, 0.7, model = 'constant_w', w_0 = -1.2, h=h_today), marker='.', linestyle=(0, (1,4)), label='w = -1.2')
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1_1.legend()
+# plt.tight_layout()
+# fig1_1.savefig(save_path + 'proper_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.png')
+# # fig1_1.savefig(save_path + 'comoving_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.pdf')
+# plt.show()
+# plt.clf()
 
 
 # ------------- Galaxy number --------------------
@@ -389,52 +389,155 @@ mass_min = 9.5
 
 # ----------------- Relative galaxy density -----------------
 # Uses single schechter function with varying alpha
-fig1, ax1 = plt.subplots()
-ax1.set_ylabel(r"Relative galaxy number density (1 / redshift Mpc$^2$)")
-ax1.set_xlabel(r"$z$")
-rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
-rel_num_w8, d_rel_num_w8 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
-rel_num_w9, d_rel_num_w9 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
-rel_num_w11, d_rel_num_w11 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
-rel_num_w12, d_rel_num_w12 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
-rel_num_EdS, d_rel_num_EdS = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today, sqd = sqd)
-rel_num_OCDM, d_rel_num_OCDM = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today, sqd = sqd)
+# fig1, ax1 = plt.subplots()
+# ax1.set_ylabel(r"Relative galaxy number density (1 / redshift Mpc$^2$)")
+# ax1.set_xlabel(r"$z$")
+# rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_w8, d_rel_num_w8 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
+# rel_num_w9, d_rel_num_w9 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
+# rel_num_w11, d_rel_num_w11 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
+# rel_num_w12, d_rel_num_w12 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
+# rel_num_EdS, d_rel_num_EdS = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_OCDM, d_rel_num_OCDM = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today, sqd = sqd)
 
 
-ax1.plot(z_bin, rel_num_LCDM, '-', marker='.', label='LCDM')
-ax1.plot(z_bin, rel_num_EdS, '--', marker='.', label='EdS')
-ax1.plot(z_bin, rel_num_OCDM, '-.', marker='.', label='OCDM')
-ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
-ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
-ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
-ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
+# ax1.plot(z_bin, rel_num_LCDM, '-', marker='.', label='LCDM')
+# ax1.plot(z_bin, rel_num_EdS, '--', marker='.', label='EdS')
+# ax1.plot(z_bin, rel_num_OCDM, '-.', marker='.', label='OCDM')
+# ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
+# ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
+# ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
+# ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
 
     
-# ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
-# ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
-# ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
-# ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
-# ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
 
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax1.legend()
-plt.tight_layout()
-fig1.savefig(save_path  + 'reldif' + 'density' + '_binsize' + str(bin_size) + '_var' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
-plt.show()
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1.legend()
+# plt.tight_layout()
+# fig1.savefig(save_path  + 'reldif' + 'density' + '_binsize' + str(bin_size) + '_var' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
+# plt.show()
 
 
 # ------------ Galaxy number density from purely integrating the Schechter function -----------
+# fig1_2, ax1_2 = plt.subplots()
+# ax1_2.set_xlabel(r"Redshift $z$", fontsize=13)
+# ax1_2.set_ylabel(r"Proper galaxy number density $\frac{dN}{dV_C}$ (Mpc$^{-3}$)", fontsize=13)
+# num_LCDM = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# num_w8 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today)
+# num_w9 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today)
+# num_w11 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today)
+# num_w12 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today)
+# num_EdS = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+# num_OCDM = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+
+# ax1_2.plot(z_array, num_LCDM, '-', marker='.', label='LCDM')
+# ax1_2.plot(z_array, num_EdS, '--', marker='.', label='EdS')
+# ax1_2.plot(z_array, num_OCDM, '-.', marker='.', label='OCDM')
+# ax1_2.plot(z_array, num_w8, ':', marker='.',label='w = -0.8')
+# ax1_2.plot(z_array, num_w9, ':', marker='.', label='w = -0.9')
+# ax1_2.plot(z_array, num_w11, '-.', marker='.',label='w = -1.1')
+# ax1_2.plot(z_array, num_w12, '-.', marker='.',label='w = -1.2')
+
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1_2.legend()
+# plt.tight_layout()
+# fig1_2.savefig(save_path + 'schechter_density' + '_binsize' + str(bin_size) + 'minMass' + str(mass_min) + '.png')
+# # fig1_1.savefig(save_path + 'comoving_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.pdf')
+# plt.show()
+# plt.clf()
+
+
+# ------------------------- Galaxy number density using bins and fixed mass limit -------------- 
+# galaxy_number_bin_masslim
+
+# fig3, ax3 = plt.subplots()
+# ax3.set_xlabel(r"Redshift $z$", fontsize=13)
+# ax3.set_ylabel(r"Galaxy number density $\frac{dN}{dV}$ (z$^{-1}$ Mpc$^{-2}$)", fontsize=13)
+# num_LCDM = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+# num_w8 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today)
+# num_w9 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today)
+# num_w11 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today)
+# num_w12 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today)
+# num_EdS = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+# num_OCDM = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+
+# ax3.plot(z_bin, num_LCDM, '-', marker='.', label='LCDM')
+# ax3.plot(z_bin, num_EdS, '--', marker='.', label='EdS')
+# ax3.plot(z_bin, num_OCDM, '-.', marker='.', label='OCDM')
+# ax3.plot(z_bin, num_w8, ':', marker='.',label='w = -0.8')
+# ax3.plot(z_bin, num_w9, ':', marker='.', label='w = -0.9')
+# ax3.plot(z_bin, num_w11, '-.', marker='.',label='w = -1.1')
+# ax3.plot(z_bin, num_w12, '-.', marker='.',label='w = -1.2')
+
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax3.legend()
+# plt.tight_layout()
+# fig3.savefig(save_path + 'galaxy_no_density' + '_binsize' + str(bin_size) + 'minMass' + str(mass_min) + '.png')
+# # fig1_1.savefig(save_path + 'comoving_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.pdf')
+# plt.show()
+# plt.clf()
+
+
+
+
+
+# ----------------- Relative galaxy density, No Evolutions -----------------
+# Uses single schechter function with varying alpha
+mass_min = 9.5
+# fig1, ax1 = plt.subplots()
+# ax1.set_ylabel(r"Relative galaxy number density (1 / redshift Mpc$^2$)")
+# ax1.set_xlabel(r"$z$")
+# rel_num_LCDM, d_rel_num_LCDM = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_w8, d_rel_num_w8 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today, sqd = sqd)
+# rel_num_w9, d_rel_num_w9 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today, sqd = sqd)
+# rel_num_w11, d_rel_num_w11 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today, sqd = sqd)
+# rel_num_w12, d_rel_num_w12 = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today, sqd = sqd)
+# rel_num_EdS, d_rel_num_EdS = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today, sqd = sqd)
+# rel_num_OCDM, d_rel_num_OCDM = delta_galaxy_density_rel_z_comb_masslim(z_array, z_ref, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today, sqd = sqd)
+
+
+# ax1.plot(z_bin, rel_num_LCDM, '-', marker='.', label='LCDM')
+# ax1.plot(z_bin, rel_num_EdS, '--', marker='.', label='EdS')
+# ax1.plot(z_bin, rel_num_OCDM, '-.', marker='.', label='OCDM')
+# ax1.plot(z_bin, rel_num_w8, ':', marker='.',label='w = -0.8')
+# ax1.plot(z_bin, rel_num_w9, ':', marker='.', label='w = -0.9')
+# ax1.plot(z_bin, rel_num_w11, '-.', marker='.',label='w = -1.1')
+# ax1.plot(z_bin, rel_num_w12, '-.', marker='.',label='w = -1.2')
+
+    
+# # ax1.fill_between(z_bin, rel_num_LCDM - d_rel_num_LCDM, rel_num_LCDM + d_rel_num_LCDM, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w8 - d_rel_num_w8, rel_num_w8 + d_rel_num_w8, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w9 - d_rel_num_w9, rel_num_w9 + d_rel_num_w9, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w11 - d_rel_num_w11, rel_num_w11 + d_rel_num_w11, alpha=0.2)
+# # ax1.fill_between(z_bin, rel_num_w12 - d_rel_num_w12, rel_num_w12 + d_rel_num_w12, alpha=0.2)
+
+# plt.rc('xtick', labelsize=11)
+# plt.rc('ytick', labelsize=11)
+# ax1.legend()
+# plt.tight_layout()
+# fig1.savefig(save_path  + 'reldif' + 'density' + '_binsize' + str(bin_size) + '_const' + '_minMass' + str(mass_min) + '_sqd' + str(sqd) + '_var' + '_zref' + str(z_ref) + '_wErr' + '.png')
+# plt.show()
+
+
+# ------------ Galaxy number density from purely integrating the Schechter function, without any galaxy formation -----------
 fig1_2, ax1_2 = plt.subplots()
 ax1_2.set_xlabel(r"Redshift $z$", fontsize=13)
 ax1_2.set_ylabel(r"Proper galaxy number density $\frac{dN}{dV_C}$ (Mpc$^{-3}$)", fontsize=13)
-num_LCDM = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-num_w8 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today)
-num_w9 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today)
-num_w11 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today)
-num_w12 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today)
-num_EdS = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
-num_OCDM = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(z_array, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(z_array, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
+num_LCDM = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
+num_w8 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today)
+num_w9 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today)
+num_w11 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today)
+num_w12 = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today)
+num_EdS = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
+num_OCDM = galaxy_no_density_masslim_vec(z_array, mass_min, 11.12, Phi_directVec(3, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(3, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
 
 ax1_2.plot(z_array, num_LCDM, '-', marker='.', label='LCDM')
 ax1_2.plot(z_array, num_EdS, '--', marker='.', label='EdS')
@@ -448,39 +551,7 @@ plt.rc('xtick', labelsize=11)
 plt.rc('ytick', labelsize=11)
 ax1_2.legend()
 plt.tight_layout()
-fig1_2.savefig(save_path + 'schechter_density' + '_binsize' + str(bin_size) + 'minMass' + str(mass_min) + '.png')
-# fig1_1.savefig(save_path + 'comoving_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.pdf')
-plt.show()
-plt.clf()
-
-
-# ------------------------- Galaxy number density using bins and fixed mass limit -------------- 
-galaxy_number_bin_masslim
-
-fig3, ax3 = plt.subplots()
-ax3.set_xlabel(r"Redshift $z$", fontsize=13)
-ax3.set_ylabel(r"Galaxy number density $\frac{dN}{dV}$ (z$^{-1}$ Mpc$^{-2}$)", fontsize=13)
-num_LCDM = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'LCDM', h=h_today)
-num_w8 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.8, h=h_today)
-num_w9 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7,  'constant_w', -0.9, h=h_today)
-num_w11 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.1, h=h_today)
-num_w12 = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0, 0.7, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0, 0.7, 'constant_w', -1.2, h=h_today)
-num_EdS = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 1, 0, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 1, 0, 0, 'LCDM', h=h_today)
-num_OCDM = galaxy_number_bin_masslim(z_array, mass_min, 11.12, Phi_directVec(z_bin, 11, 2.88e-3, 0.3, 0.7, 0, "LCDM", h=h_today), 0, alpha(z_bin, -0.093, -1.3), -1.47, 0.3, 0.7, 0, 'LCDM', h=h_today)
-
-ax3.plot(z_bin, num_LCDM, '-', marker='.', label='LCDM')
-ax3.plot(z_bin, num_EdS, '--', marker='.', label='EdS')
-ax3.plot(z_bin, num_OCDM, '-.', marker='.', label='OCDM')
-ax3.plot(z_bin, num_w8, ':', marker='.',label='w = -0.8')
-ax3.plot(z_bin, num_w9, ':', marker='.', label='w = -0.9')
-ax3.plot(z_bin, num_w11, '-.', marker='.',label='w = -1.1')
-ax3.plot(z_bin, num_w12, '-.', marker='.',label='w = -1.2')
-
-plt.rc('xtick', labelsize=11)
-plt.rc('ytick', labelsize=11)
-ax3.legend()
-plt.tight_layout()
-fig3.savefig(save_path + 'galaxy_no_density' + '_binsize' + str(bin_size) + 'minMass' + str(mass_min) + '.png')
+fig1_2.savefig(save_path + 'schechter_density' + '_const' + '_binsize' + str(bin_size) + 'minMass' + str(mass_min) + '.png')
 # fig1_1.savefig(save_path + 'comoving_vol' + '_binsize' + str(bin_size) + '_zref' + str(z_ref) + '.pdf')
 plt.show()
 plt.clf()
