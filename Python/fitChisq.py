@@ -44,6 +44,8 @@ def ls_fit(xdata, ydata, yerr, func):
     # Function to fit least square fitting, returning parameters and their uncertainty using covariance matrix
     # Because of how the arguments of the fitting function must be in curve_fit(), we have to write if statement each time for how many fitting parameters we're using
     d_par = np.array([])
+    print(xdata.size)
+    print(ydata.size)
     par, cov = optimize.curve_fit(func, xdata, ydata, sigma=yerr)
     # print(par)
     # print(cov)

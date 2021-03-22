@@ -256,13 +256,14 @@ def mass_limit_rel_to_LCDM(z, mass, omega_m, omega_k, omega_0, model, w_0=-1, w_
 #    diff = Fraction **2
 #    return diff
 
-def galaxy_no_density_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
+def galaxy_no_density_masslim(z, z_ref, ratio, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	# Returns the number density of galaxies as a function of redshift for a given magnitude limit with given cosmology model
 	# In the unit of Mpc^-3
+	# In this branch the galaxy number density is made to increase artificially in linear fassion
 	
 	mass_min = mass_limit_rel_to_LCDM(z, mass, omega_m, omega_k, omega_0, model, w_0, w_1, h)
-	
-	return integrate.quad(lambda mass: schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2), mass_min, 15)[0]
+	phi_ref = integrate.quad(lambda mass: schechter_mass(mass, break_mass, phi1, phi2, alpha1, alpha2), mass_min, 15)[0]
+	return ratio * phi_ref - phi_ref * (ratio-1)/z_ref * z
 	
 def galaxy_number_masslim(z, mass, break_mass, phi1, phi2, alpha1, alpha2, omega_m, omega_k, omega_0, model, w_0=-1, w_1=0, h=0.7):
 	
