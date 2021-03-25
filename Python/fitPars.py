@@ -81,7 +81,7 @@ d_phi1_forward = 1.5e-5
 d_alpha1_backward = 0.02
 d_alpha1_forward = 0.06
 
-ratio = 10
+ratio = 100
 
 # Parameters for varying alpha
 m_alpha = -0.093
@@ -101,7 +101,7 @@ w_0 = -1
 w_1 = 0 
 h_today = 0.7
 
-bin_size = 0.25
+bin_size = 0.01
 z_array = np.linspace(0.01,z_ref,round(z_ref/bin_size))
 h_array = np.linspace(0.60, 0.80, 10)
 om_array = np.linspace(0.1, 0.5, 10)
